@@ -69,45 +69,6 @@ public class TimeSlotRequest {
     private Integer sortOrder;
 }
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class CreateScheduleEntryRequest {
-
-    @NotNull(message = "Timetable ID is required")
-    private UUID timetableId;
-
-    private UUID timeSlotId;
-
-    @NotBlank(message = "Title is required")
-    @Size(max = 255)
-    private String title;
-
-    private String description;
-
-    private DayOfWeek dayOfWeek;
-    private LocalDate scheduleDate;
-    private LocalDateTime startDatetime;
-    private LocalDateTime endDatetime;
-
-    private UUID resourceId;
-    private UUID assignedToId;
-    private Set<UUID> participantIds;
-
-    @NotNull(message = "Entry type is required")
-    private String entryType;
-
-    private String color;
-    private Boolean isRecurring = false;
-
-    @Valid
-    private RecurringPatternRequest recurringPattern;
-
-    private String notes;
-    private String metadata;
-}
 
 @Getter
 @Setter

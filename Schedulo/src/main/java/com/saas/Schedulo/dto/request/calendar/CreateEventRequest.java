@@ -1,4 +1,32 @@
 package com.saas.Schedulo.dto.request.calendar;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CreateEventRequest {
+    @NotBlank(message = "Title is required")
+    @Size(max = 255)
+    private String title;
+    private String description;
+    @NotNull(message = "Start datetime is required")
+    private LocalDateTime startDatetime;
+    @NotNull(message = "End datetime is required")
+    private LocalDateTime endDatetime;
+    private Boolean allDay = false;
+    private String location;
+    private String virtualMeetingUrl;
+    @NotNull(message = "Event type is required")
+    private String eventType;
+    private String visibility = "ORGANIZATION";
+    private String color;
+    private Set<UUID> attendeeIds;
+    private Boolean isRecurring = false;
+    private com.timetable.dto.request.timetable.RecurringPatternRequest recurringPattern;
+    @AssertTrue(message = "End datetime must be after start datetime")
+    private boolean isValidDateRange() {
+        if (startDatetime == null || endDatetime == null) return true;
+        return endDatetime.isAfter(startDatetime);
+    }
 }
