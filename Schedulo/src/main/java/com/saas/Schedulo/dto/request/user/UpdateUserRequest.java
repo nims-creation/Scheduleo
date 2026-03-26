@@ -1,5 +1,7 @@
 package com.saas.Schedulo.dto.request.user;
 
+import jakarta.validation.constraints.*;
+
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

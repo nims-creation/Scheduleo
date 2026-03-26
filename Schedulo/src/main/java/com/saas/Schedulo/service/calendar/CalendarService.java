@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.saas.Schedulo.dto.response.calendar.HolidayResponse;
+
 public interface CalendarService {
     CalendarEventResponse createEvent(CreateEventRequest request, UUID organizationId, UUID creatorId);
     CalendarEventResponse updateEvent(UUID id, UpdateEventRequest request);

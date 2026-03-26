@@ -1,5 +1,7 @@
 package com.saas.Schedulo.dto.request.calendar;
 
+import jakarta.validation.constraints.*;
+
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

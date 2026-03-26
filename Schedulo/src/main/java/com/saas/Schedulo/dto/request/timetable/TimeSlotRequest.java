@@ -1,8 +1,9 @@
 package com.saas.Schedulo.dto.request.timetable;
 
+import jakarta.validation.constraints.*;
+
 import com.saas.Schedulo.validation.annotation.ValidTimeRange;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;

@@ -1,5 +1,7 @@
 package com.saas.Schedulo.dto.request.payment;
 
+import jakarta.validation.constraints.*;
+
 import lombok.*;
 
 @Getter

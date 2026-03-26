@@ -5,6 +5,9 @@ import com.saas.Schedulo.dto.response.payment.SubscriptionResponse;
 
 import java.util.UUID;
 
+import java.util.List;
+import com.saas.Schedulo.dto.response.subscription.SubscriptionPlanResponse;
+
 public interface SubscriptionService {
     SubscriptionResponse createSubscription(CreateSubscriptionRequest request, UUID organizationId);
     SubscriptionResponse getByOrganization(UUID organizationId);

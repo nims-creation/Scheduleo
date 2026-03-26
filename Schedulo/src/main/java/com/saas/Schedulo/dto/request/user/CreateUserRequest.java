@@ -1,5 +1,7 @@
 package com.saas.Schedulo.dto.request.user;
 
+import jakarta.validation.constraints.*;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

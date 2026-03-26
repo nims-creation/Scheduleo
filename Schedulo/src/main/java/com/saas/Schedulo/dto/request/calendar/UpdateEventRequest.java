@@ -1,5 +1,7 @@
 package com.saas.Schedulo.dto.request.calendar;
 
+import jakarta.validation.constraints.*;
+
 import lombok.*;
 
 import java.time.LocalDateTime;

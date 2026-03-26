@@ -8,6 +8,10 @@ import com.saas.Schedulo.dto.response.payment.PaymentResponse;
 import java.awt.print.Pageable;
 import java.util.UUID;
 
+import java.util.List;
+import com.saas.Schedulo.dto.response.payment.PaymentMethodResponse;
+import com.saas.Schedulo.dto.response.payment.InvoiceResponse;
+
 public interface PaymentService {
     PaymentResponse processPayment(ProcessPaymentRequest request, UUID organizationId);
     PaymentResponse getPaymentById(UUID paymentId);
