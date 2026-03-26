@@ -1,4 +1,10 @@
 package com.saas.Schedulo.entity.organization;
 
-public class OrganizationType {
+public enum OrganizationType {
+    COMPANY,
+    SCHOOL,
+    NON_PROFIT,
+    GOVERNMENT,
+    INDIVIDUAL,
+    OTHER
 }
