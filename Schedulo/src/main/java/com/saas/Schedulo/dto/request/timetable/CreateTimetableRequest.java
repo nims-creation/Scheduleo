@@ -1,17 +1,12 @@
 package com.saas.Schedulo.dto.request.timetable;
 
 import com.timetable.entity.timetable.Timetable;
-import com.timetable.validation.annotation.ValidTimeRange;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -46,54 +41,10 @@ public class CreateTimetableRequest {
     private String templateName;
 }
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ValidTimeRange(startField = "startTime", endField = "endTime")
-public class TimeSlotRequest {
-
-    private String slotName;
-
-    @NotNull(message = "Start time is required")
-    private LocalTime startTime;
-
-    @NotNull(message = "End time is required")
-    private LocalTime endTime;
-
-    private DayOfWeek dayOfWeek;
-    private String slotType;
-    private Boolean breakAfter = false;
-    private Integer breakDurationMinutes;
-    private Integer sortOrder;
-}
 
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class RecurringPatternRequest {
 
-    @NotNull(message = "Frequency is required")
-    private String frequency;
 
-    @Min(1)
-    private Integer intervalValue = 1;
-
-    private Set<DayOfWeek> daysOfWeek;
-    private Integer dayOfMonth;
-    private Integer weekOfMonth;
-    private Integer monthOfYear;
-
-    @NotNull(message = "Start date is required")
-    private LocalDate startDate;
-
-    private LocalDate endDate;
-    private Integer occurrenceCount;
-}
 
 
 

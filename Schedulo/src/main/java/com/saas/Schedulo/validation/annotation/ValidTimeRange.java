@@ -1,6 +1,6 @@
 package com.saas.Schedulo.validation.annotation;
 
-import com.timetable.validation.validator.TimeRangeValidator;
+import com.saas.Schedulo.validation.validator.TimeRangeValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
