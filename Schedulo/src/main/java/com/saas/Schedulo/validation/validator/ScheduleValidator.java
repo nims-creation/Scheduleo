@@ -1,7 +1,7 @@
 package com.saas.Schedulo.validation.validator;
 
-import com.timetable.dto.request.timetable.CreateScheduleEntryRequest;
-import com.timetable.validation.annotation.ValidSchedule;
+import com.saas.Schedulo.dto.request.timetable.CreateScheduleEntryRequest;
+import com.saas.Schedulo.validation.annotation.ValidSchedule;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

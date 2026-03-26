@@ -1,5 +1,23 @@
 package com.saas.Schedulo.service.impl.ai;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.saas.Schedulo.dto.request.timetable.CreateScheduleEntryRequest;
+import com.saas.Schedulo.dto.response.timetable.ScheduleEntryResponse;
+import com.saas.Schedulo.entity.timetable.ScheduleEntry;
+import com.saas.Schedulo.entity.timetable.Timetable;
+import com.saas.Schedulo.exception.resource.ResourceNotFoundException;
+import com.saas.Schedulo.repository.timetable.ScheduleEntryRepository;
+import com.saas.Schedulo.repository.timetable.TimetableRepository;
+import com.saas.Schedulo.service.ai.AiScheduleService;
+import com.saas.Schedulo.service.timetable.ConflictDetectionService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.*;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

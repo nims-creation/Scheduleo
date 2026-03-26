@@ -1,6 +1,6 @@
 package com.saas.Schedulo.validation.validator;
 
-import com.timetable.validation.annotation.ValidTimeRange;
+import com.saas.Schedulo.validation.annotation.ValidTimeRange;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.BeanWrapper;

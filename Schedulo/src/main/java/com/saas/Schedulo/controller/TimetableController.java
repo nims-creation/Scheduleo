@@ -1,5 +1,11 @@
 package com.saas.Schedulo.controller;
 
+import com.saas.Schedulo.dto.request.timetable.CreateTimetableRequest;
+import com.saas.Schedulo.dto.response.ApiResponse;
+import com.saas.Schedulo.dto.response.PagedResponse;
+import com.saas.Schedulo.dto.response.timetable.TimetableResponse;
+import com.saas.Schedulo.security.CustomUserDetails;
+import com.saas.Schedulo.service.timetable.TimetableService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

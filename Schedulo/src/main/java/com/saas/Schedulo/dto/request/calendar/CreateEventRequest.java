@@ -1,5 +1,15 @@
 package com.saas.Schedulo.dto.request.calendar;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,7 +33,7 @@ public class CreateEventRequest {
     private String color;
     private Set<UUID> attendeeIds;
     private Boolean isRecurring = false;
-    private com.timetable.dto.request.timetable.RecurringPatternRequest recurringPattern;
+    private com.saas.Schedulo.dto.request.timetable.RecurringPatternRequest recurringPattern;
     @AssertTrue(message = "End datetime must be after start datetime")
     private boolean isValidDateRange() {
         if (startDatetime == null || endDatetime == null) return true;

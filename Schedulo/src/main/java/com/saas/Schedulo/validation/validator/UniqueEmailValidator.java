@@ -1,7 +1,7 @@
 package com.saas.Schedulo.validation.validator;
 
-import com.timetable.repository.user.UserRepository;
-import com.timetable.validation.annotation.UniqueEmail;
+import com.saas.Schedulo.repository.user.UserRepository;
+import com.saas.Schedulo.validation.annotation.UniqueEmail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;

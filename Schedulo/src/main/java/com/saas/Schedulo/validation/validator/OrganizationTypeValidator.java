@@ -1,7 +1,7 @@
 package com.saas.Schedulo.validation.validator;
 
-import com.timetable.entity.organization.OrganizationType;
-import com.timetable.validation.annotation.ValidOrganizationType;
+import com.saas.Schedulo.entity.organization.OrganizationType;
+import com.saas.Schedulo.validation.annotation.ValidOrganizationType;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

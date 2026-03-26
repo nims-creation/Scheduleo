@@ -1,5 +1,15 @@
 package com.saas.Schedulo.repository.timetable;
 
+import com.saas.Schedulo.entity.timetable.ScheduleEntry;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
 @Repository
 public interface ScheduleEntryRepository extends JpaRepository<ScheduleEntry, UUID> {
     @Query("SELECT se FROM ScheduleEntry se WHERE se.timetable.id = :timetableId " +

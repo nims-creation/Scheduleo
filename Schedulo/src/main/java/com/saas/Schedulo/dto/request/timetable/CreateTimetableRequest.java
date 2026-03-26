@@ -1,6 +1,6 @@
 package com.saas.Schedulo.dto.request.timetable;
 
-import com.timetable.entity.timetable.Timetable;
+import com.saas.Schedulo.entity.timetable.Timetable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
