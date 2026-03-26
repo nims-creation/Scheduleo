@@ -1,4 +1,16 @@
 package com.saas.Schedulo.repository.user;
 
-public class RoleRepository {
+import com.saas.Schedulo.entity.user.Role;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface RoleRepository extends JpaRepository<Role, UUID> {
+    Optional<Role> findByName(String name);
+    List<Role> findByIsSystemRoleTrue();
+    @Query("SELECT r FROM Role r WHERE r.name IN :names")
+    List<Role> findByNames(@Param("names") List<String> names);
 }
