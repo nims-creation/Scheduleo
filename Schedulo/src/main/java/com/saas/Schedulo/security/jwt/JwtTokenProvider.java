@@ -1,5 +1,7 @@
 package com.saas.Schedulo.security.jwt;
 
+import com.saas.Schedulo.entity.user.User;
+import com.saas.Schedulo.security.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
