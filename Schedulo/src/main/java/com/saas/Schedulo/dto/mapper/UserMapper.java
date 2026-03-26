@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
-    @Mapping(target = "id", ignore = true)
+
     @Mapping(target = "passwordHash", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "organization", ignore = true)

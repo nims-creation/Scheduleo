@@ -14,7 +14,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface TimetableMapper {
 
-    @Mapping(target = "id", ignore = true)
+
     @Mapping(target = "organization", ignore = true)
     @Mapping(target = "department", ignore = true)
     @Mapping(target = "status", constant = "DRAFT")

@@ -10,6 +10,7 @@ import com.saas.Schedulo.dto.request.auth.SignupRequest;
 import com.saas.Schedulo.dto.response.auth.AuthResponse;
 import com.saas.Schedulo.dto.response.auth.TokenRefreshResponse;
 import com.saas.Schedulo.entity.organization.Organization;
+import com.saas.Schedulo.entity.organization.OrganizationType;
 import com.saas.Schedulo.entity.user.RefreshToken;
 import com.saas.Schedulo.entity.user.Role;
 import com.saas.Schedulo.entity.user.User;

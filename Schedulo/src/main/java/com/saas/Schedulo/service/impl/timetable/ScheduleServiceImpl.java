@@ -46,7 +46,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .orElseThrow(() -> new ResourceNotFoundException("Timetable", "id", request.getTimetableId()));
 
         ConflictCheckResponse conflicts = conflictDetectionService.detectConflicts(request, null);
-        if (conflicts.isHasConflicts()) {
+                if (conflicts.getHasConflicts()) {
             throw new ResourceConflictException("Cannot create schedule entry due to conflicts");
         }
 
@@ -65,7 +65,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .orElseThrow(() -> new ResourceNotFoundException("Timetable", "id", request.getTimetableId()));
 
         ConflictCheckResponse conflicts = conflictDetectionService.detectConflicts(request, id);
-        if (conflicts.isHasConflicts()) {
+                if (conflicts.getHasConflicts()) {
             throw new ResourceConflictException("Cannot update schedule entry due to conflicts");
         }
 
@@ -128,7 +128,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             entryRequest.setTimetableId(request.getTimetableId());
             if (!request.getSkipConflicts()) {
                 ConflictCheckResponse conflicts = conflictDetectionService.detectConflicts(entryRequest, null);
-                if (conflicts.isHasConflicts()) {
+                        if (conflicts.getHasConflicts()) {
                     if (!request.getOverwriteExisting()) {
                         throw new ResourceConflictException("Conflict detected in bulk creation");
                     }
@@ -159,7 +159,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .scheduleDate(request.getScheduleDate())
                 .startDatetime(request.getStartDatetime())
                 .endDatetime(request.getEndDatetime())
-                .entryType(request.getEntryType() != null ? ScheduleEntry.EntryType.valueOf(request.getEntryType()) : ScheduleEntry.EntryType.REGULAR)
+                .entryType(request.getEntryType() != null ? ScheduleEntry.EntryType.valueOf(request.getEntryType()) : ScheduleEntry.EntryType.EVENT)
                 .color(request.getColor())
                 .isRecurring(request.getIsRecurring() != null ? request.getIsRecurring() : false)
                 .notes(request.getNotes())

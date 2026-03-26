@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+
 import java.io.IOException;
 
 @Component

@@ -158,7 +158,7 @@ public class TimetableServiceImpl implements TimetableService {
         );
 
         if (hasOverlap) {
-            throw new ScheduleConflictException(
+            throw new ResourceConflictException(
                     "Another timetable is already published for the overlapping date range"
             );
         }
