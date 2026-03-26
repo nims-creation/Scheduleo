@@ -1,7 +1,7 @@
 package com.saas.Schedulo.entity.calendar;
 
-import com.timetable.entity.base.BaseEntity;
-import com.timetable.entity.organization.Organization;
+import com.saas.Schedulo.entity.base.BaseEntity;
+import com.saas.Schedulo.entity.organization.Organization;
 import jakarta.persistence.*;
 import lombok.*;
 

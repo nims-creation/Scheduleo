@@ -1,6 +1,6 @@
 package com.saas.Schedulo.entity.subscription;
 
-import com.timetable.entity.base.BaseEntity;
+import com.saas.Schedulo.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

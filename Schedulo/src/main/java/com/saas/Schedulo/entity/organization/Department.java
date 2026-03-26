@@ -1,6 +1,6 @@
 package com.saas.Schedulo.entity.organization;
 
-import com.timetable.entity.base.BaseEntity;
+import com.saas.Schedulo.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +33,7 @@ public class Department extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "head_id")
-    private com.timetable.entity.user.User head;
+    private com.saas.Schedulo.entity.user.User head;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_department_id")

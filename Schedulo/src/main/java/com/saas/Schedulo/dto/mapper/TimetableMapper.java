@@ -1,8 +1,12 @@
 package com.saas.Schedulo.dto.mapper;
 
-import com.timetable.dto.request.timetable.*;
-import com.timetable.dto.response.timetable.*;
-import com.timetable.entity.timetable.*;
+import com.saas.Schedulo.dto.request.timetable.CreateTimetableRequest;
+import com.saas.Schedulo.dto.response.timetable.ScheduleEntryResponse;
+import com.saas.Schedulo.dto.response.timetable.TimeSlotResponse;
+import com.saas.Schedulo.dto.response.timetable.TimetableResponse;
+import com.saas.Schedulo.entity.timetable.ScheduleEntry;
+import com.saas.Schedulo.entity.timetable.TimeSlot;
+import com.saas.Schedulo.entity.timetable.Timetable;
 import org.mapstruct.*;
 
 import java.util.List;
