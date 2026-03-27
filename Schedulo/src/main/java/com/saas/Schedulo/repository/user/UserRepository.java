@@ -22,6 +22,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByPasswordResetToken(String token);
     @Query("SELECT u FROM User u WHERE u.organization.id = :orgId AND u.isDeleted = false")
     Page<User> findByOrganizationId(@Param("orgId") UUID organizationId, Pageable pageable);
+    
+    List<User> findByOrganizationIdAndIsDeletedFalse(UUID organizationId);
+    
     @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.isDeleted = false")
     List<User> findByRoleName(@Param("roleName") String roleName);
     @Query("SELECT u FROM User u WHERE u.organization.id = :orgId " +
