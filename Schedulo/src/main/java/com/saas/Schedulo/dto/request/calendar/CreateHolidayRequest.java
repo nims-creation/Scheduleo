@@ -1,30 +1,33 @@
-package com.saas.Schedulo.dto.response.calendar;
+package com.saas.Schedulo.dto.request.calendar;
 
 import com.saas.Schedulo.entity.calendar.Holiday;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HolidayResponse {
+public class CreateHolidayRequest {
 
-    private UUID id;
+    @NotBlank(message = "Holiday name is required")
     private String name;
+
     private String description;
+
+    @NotNull(message = "Holiday date is required")
     private LocalDate holidayDate;
+
+    @NotNull(message = "Holiday type is required")
     private Holiday.HolidayType holidayType;
-    private Boolean isRecurring;
-    private Boolean isHalfDay;
+
+    private Boolean isRecurring = false;
+    private Boolean isHalfDay = false;
     private String applicableTo;
-    private UUID organizationId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }
