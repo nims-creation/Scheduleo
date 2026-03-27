@@ -1,11 +1,12 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Calendar, Clock, Users, LayoutDashboard, Zap } from 'lucide-react';
+import { LogOut, Calendar, Clock, Users, LayoutDashboard, Zap, Layers } from 'lucide-react';
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import DashboardHome from './dashboard/DashboardHome';
 import TeamMembers from './dashboard/TeamMembers';
 import Timetables from './dashboard/Timetables';
 import OrganizationSettings from './dashboard/OrganizationSettings';
+import Departments from './dashboard/Departments';
 
 const NavItem = ({ to, icon: Icon, label, exact }) => {
   const location = useLocation();
@@ -61,6 +62,7 @@ const Dashboard = () => {
 
           <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.1em', padding: '1rem 0.5rem 0.25rem' }}>Organization</div>
           <NavItem to="/dashboard/team" icon={Users} label="Team Members" />
+          <NavItem to="/dashboard/departments" icon={Layers} label="Departments" />
           <NavItem to="/dashboard/settings" icon={Zap} label="Settings" />
         </nav>
 
@@ -105,6 +107,7 @@ const Dashboard = () => {
             <Route path="/" element={<DashboardHome />} />
             <Route path="team" element={<TeamMembers />} />
             <Route path="timetables" element={<Timetables />} />
+            <Route path="departments" element={<Departments />} />
             <Route path="settings" element={<OrganizationSettings />} />
           </Routes>
         </div>
