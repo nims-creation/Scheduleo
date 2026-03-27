@@ -35,10 +35,18 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: false, error: data.message };
     } catch (err) {
-      return { 
-        success: false, 
-        error: err.response?.data?.message || 'Failed to login' 
-      };
+      let errorMsg = 'Failed to login';
+      if (err.response?.data) {
+        const { message, error } = err.response.data;
+        if (error?.details && typeof error.details === 'object' && Object.keys(error.details).length > 0) {
+          errorMsg = Object.values(error.details)[0];
+        } else if (error?.description) {
+          errorMsg = error.description;
+        } else if (message) {
+          errorMsg = message;
+        }
+      }
+      return { success: false, error: errorMsg };
     }
   };
 
@@ -57,10 +65,18 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: false, error: data.message };
     } catch (err) {
-      return { 
-        success: false, 
-        error: err.response?.data?.message || err.response?.data?.errors?.[0]?.defaultMessage || 'Failed to register' 
-      };
+      let errorMsg = 'Failed to register';
+      if (err.response?.data) {
+        const { message, error } = err.response.data;
+        if (error?.details && typeof error.details === 'object' && Object.keys(error.details).length > 0) {
+          errorMsg = Object.values(error.details)[0];
+        } else if (error?.description) {
+          errorMsg = error.description;
+        } else if (message) {
+          errorMsg = message;
+        }
+      }
+      return { success: false, error: errorMsg };
     }
   };
 

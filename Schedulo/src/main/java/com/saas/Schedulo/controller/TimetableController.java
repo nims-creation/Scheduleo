@@ -4,8 +4,11 @@ import com.saas.Schedulo.dto.request.timetable.CreateTimetableRequest;
 import com.saas.Schedulo.dto.response.ApiResponse;
 import com.saas.Schedulo.dto.response.PagedResponse;
 import com.saas.Schedulo.dto.response.timetable.TimetableResponse;
+import com.saas.Schedulo.dto.request.timetable.GenerateTimetableRequest;
+import com.saas.Schedulo.dto.response.timetable.ScheduleEntryResponse;
 import com.saas.Schedulo.security.CustomUserDetails;
 import com.saas.Schedulo.service.timetable.TimetableService;
+import com.saas.Schedulo.service.timetable.TimetableGeneratorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +34,7 @@ import java.util.UUID;
 public class TimetableController {
 
     private final TimetableService timetableService;
+    private final TimetableGeneratorService timetableGeneratorService;
 
     @PostMapping
     @Operation(summary = "Create timetable", description = "Create a new timetable")
@@ -76,6 +80,20 @@ public class TimetableController {
         PagedResponse<TimetableResponse> response =
                 timetableService.getByOrganization(currentUser.getOrganizationId(), pageable);
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @PostMapping("/{id}/generate")
+    @Operation(summary = "Generate timetable entries", description = "Automatically generates a timetable based on class requirements and resources")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public ResponseEntity<ApiResponse<List<ScheduleEntryResponse>>> generateTimetable(
+            @PathVariable UUID id,
+            @Valid @RequestBody GenerateTimetableRequest request) {
+        
+        request.setTimetableId(id);
+        List<ScheduleEntryResponse> generatedEntries = timetableGeneratorService.generateTimetable(request);
+        
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(generatedEntries, "Timetable generated successfully"));
     }
 
     @GetMapping("/active")
