@@ -49,18 +49,23 @@ public class Organization extends BaseEntity {
     @Embedded
     private Address address;
 
+    @Builder.Default
     @Column(name = "timezone", length = 50)
     private String timezone = "UTC";
 
+    @Builder.Default
     @Column(name = "working_days")
     private String workingDays = "MON,TUE,WED,THU,FRI";
 
+    @Builder.Default
     @Column(name = "working_hours_start")
     private String workingHoursStart = "08:00";
 
+    @Builder.Default
     @Column(name = "working_hours_end")
     private String workingHoursEnd = "18:00";
 
+    @Builder.Default
     @Column(name = "slot_duration_minutes")
     private Integer slotDurationMinutes = 60;
 
@@ -79,14 +84,18 @@ public class Organization extends BaseEntity {
     @OneToOne(mappedBy = "organization", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Subscription subscription;
 
+    @Builder.Default
     @Column(name = "max_users")
     private Integer maxUsers = 10;
 
+    @Builder.Default
     @Column(name = "max_schedules_per_day")
     private Integer maxSchedulesPerDay = 100;
 
+    @Builder.Default
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     @Column(name = "settings", columnDefinition = "JSON")
-    private String settings;
+    private java.util.Map<String, Object> settings = new java.util.HashMap<>();
 }
 
 @Embeddable

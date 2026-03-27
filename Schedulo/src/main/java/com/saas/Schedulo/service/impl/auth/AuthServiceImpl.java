@@ -121,8 +121,10 @@ public class AuthServiceImpl implements AuthService {
                 .authProvider(User.AuthProvider.LOCAL)
                 .emailVerified(false)
                 .emailVerificationToken(UUID.randomUUID().toString())
-                .roles(Set.of(userRole))
+                .roles(new java.util.HashSet<>(java.util.Set.of(userRole)))
                 .build();
+
+        user = userRepository.save(user);
 
         if (request.getOrganizationName() != null && !request.getOrganizationName().isBlank()) {
             Organization organization = createOrganization(request, user);
@@ -131,9 +133,10 @@ public class AuthServiceImpl implements AuthService {
             Role adminRole = roleRepository.findByName("ROLE_ADMIN")
                     .orElseThrow(() -> new ResourceNotFoundException("Role", "name", "ROLE_ADMIN"));
             user.getRoles().add(adminRole);
+            
+            user = userRepository.save(user);
         }
 
-        user = userRepository.save(user);
         log.info("User created successfully: {}", user.getEmail());
 
         // TODO: Send verification email

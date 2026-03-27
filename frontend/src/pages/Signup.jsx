@@ -10,7 +10,8 @@ const Signup = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    organizationName: ''
+    organizationName: '',
+    organizationType: 'COMPANY'
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -85,11 +86,28 @@ const Signup = () => {
             </div>
           </div>
           
-          <div className="input-group">
-            <label className="input-label">Organization Name (Optional)</label>
-            <div style={{ position: 'relative' }}>
-              <Building style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
-              <input type="text" name="organizationName" className="input-field" style={{ paddingLeft: '2.5rem' }} placeholder="Your Company Ltd" value={formData.organizationName} onChange={handleChange} />
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <div className="input-group" style={{ flex: 2 }}>
+              <label className="input-label">Organization Name (Optional)</label>
+              <div style={{ position: 'relative' }}>
+                <Building style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
+                <input type="text" name="organizationName" className="input-field" style={{ paddingLeft: '2.5rem' }} placeholder="Your Company Ltd" value={formData.organizationName} onChange={handleChange} />
+              </div>
+            </div>
+            
+            <div className="input-group" style={{ flex: 1 }}>
+              <label className="input-label">Type</label>
+              <select name="organizationType" className="input-field" value={formData.organizationType} onChange={handleChange} style={{ cursor: 'pointer' }}>
+                <option value="COMPANY">Company</option>
+                <option value="HOSPITAL">Hospital</option>
+                <option value="SCHOOL">School</option>
+                <option value="COLLEGE">College</option>
+                <option value="UNIVERSITY">University</option>
+                <option value="NON_PROFIT">Non-Profit</option>
+                <option value="GOVERNMENT">Government</option>
+                <option value="INDIVIDUAL">Individual</option>
+                <option value="OTHER">Other</option>
+              </select>
             </div>
           </div>
 

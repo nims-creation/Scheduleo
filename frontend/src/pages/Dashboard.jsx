@@ -1,11 +1,26 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LogOut, Calendar, Clock, Users, Building, Settings } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
+
+import DashboardHome from './dashboard/DashboardHome';
+import TeamMembers from './dashboard/TeamMembers';
+import Timetables from './dashboard/Timetables';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const getLinkStyle = (path) => {
+    const isActive = location.pathname === path || (path !== '/dashboard' && location.pathname.startsWith(path));
+    return {
+      display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', 
+      borderRadius: 'var(--radius-sm)', textDecoration: 'none',
+      color: isActive ? 'white' : 'var(--text-secondary)', 
+      backgroundColor: isActive ? 'var(--bg-glass-hover)' : 'transparent'
+    };
+  };
 
   const handleLogout = () => {
     logout();
@@ -25,20 +40,20 @@ const Dashboard = () => {
 
         <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600', marginBottom: '0.5rem' }}>Overview</div>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', color: 'white', backgroundColor: 'var(--bg-glass-hover)', textDecoration: 'none' }}>
-            <Calendar size={18} /> Schedule
-          </a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-secondary)', textDecoration: 'none' }}>
+          <Link to="/dashboard" style={getLinkStyle('/dashboard')}>
+            <Calendar size={18} /> Dashboard
+          </Link>
+          <Link to="/dashboard/timetables" style={getLinkStyle('/dashboard/timetables')}>
             <Clock size={18} /> Timetables
-          </a>
+          </Link>
           
           <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600', marginTop: '1.5rem', marginBottom: '0.5rem' }}>Organization</div>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-secondary)', textDecoration: 'none' }}>
+          <Link to="/dashboard/team" style={getLinkStyle('/dashboard/team')}>
             <Users size={18} /> Team Members
-          </a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-secondary)', textDecoration: 'none' }}>
+          </Link>
+          <Link to="#" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text-secondary)', textDecoration: 'none' }}>
             <Building size={18} /> Departments
-          </a>
+          </Link>
         </div>
 
         <div style={{ padding: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
@@ -66,30 +81,11 @@ const Dashboard = () => {
         </header>
 
         {/* Dynamic Content */}
-        <div style={{ padding: '2rem', overflowY: 'auto', flex: 1 }}>
-          <div className="glass-card animate-slide-up" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
-            <h3 style={{ color: 'white' }}>Welcome to Schedulo, {user?.firstName}!</h3>
-            <p style={{ marginTop: '0.5rem' }}>Your dashboard is ready. This authenticated environment uses JWT tokens to securely fetch your organizational data from the Spring Boot backend.</p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
-             <div className="glass-card">
-               <h4 style={{ color: 'var(--text-secondary)' }}>Upcoming Events</h4>
-               <div style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0' }}>0</div>
-               <p style={{ fontSize: '0.875rem' }}>No conflicts detected</p>
-             </div>
-             <div className="glass-card">
-               <h4 style={{ color: 'var(--text-secondary)' }}>Active Timetables</h4>
-               <div style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0' }}>0</div>
-               <p style={{ fontSize: '0.875rem' }}>Create your first pattern</p>
-             </div>
-             <div className="glass-card">
-               <h4 style={{ color: 'var(--text-secondary)' }}>Pending Requests</h4>
-               <div style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0' }}>0</div>
-               <p style={{ fontSize: '0.875rem' }}>All caught up!</p>
-             </div>
-          </div>
-        </div>
+        <Routes>
+          <Route path="/" element={<DashboardHome />} />
+          <Route path="team" element={<TeamMembers />} />
+          <Route path="timetables" element={<Timetables />} />
+        </Routes>
       </main>
     </div>
   );
