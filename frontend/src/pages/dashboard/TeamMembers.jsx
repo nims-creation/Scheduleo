@@ -1,5 +1,6 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { Users, Mail, Phone, Calendar, Plus, Search, Shield, X, CheckCircle } from 'lucide-react';
 
 const ROLE_COLORS = { ADMIN: { bg: 'rgba(247,79,110,0.15)', color: 'var(--brand-danger)' }, MANAGER: { bg: 'rgba(79,142,247,0.15)', color: 'var(--brand-primary)' }, MEMBER: { bg: 'rgba(155,114,247,0.15)', color: 'var(--brand-secondary)' } };
@@ -10,10 +11,21 @@ const TeamMembers = () => {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [toast, setToast] = useState(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteData, setInviteData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    role: 'ROLE_USER'
+  });
+  const [inviting, setInviting] = useState(false);
+  const { user: currentUser } = useAuth(); // Need to get current user to assign org id
 
   const showToast = (msg, type='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
 
-  useEffect(() => {
+  const fetchTeam = () => {
+    setLoading(true);
     api.get('/api/v1/users')
       .then(res => {
         const list = res.data?.data?.content || res.data?.data || [];
@@ -21,7 +33,40 @@ const TeamMembers = () => {
       })
       .catch(() => setError('Failed to load team members.'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchTeam();
   }, []);
+
+  const handleInviteChange = (e) => setInviteData({ ...inviteData, [e.target.name]: e.target.value });
+
+  const handleInviteSubmit = async (e) => {
+    e.preventDefault();
+    setInviting(true);
+    try {
+      const payload = {
+        ...inviteData,
+        roles: [inviteData.role],
+        organizationId: currentUser?.organization?.id,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      };
+      
+      const res = await api.post('/api/v1/users', payload);
+      if (res.data?.success) {
+        showToast('Team member invited successfully!');
+        setShowInviteModal(false);
+        setInviteData({ firstName: '', lastName: '', email: '', password: '', role: 'ROLE_USER' });
+        fetchTeam();
+      } else {
+        showToast(res.data?.message || 'Failed to invite user', 'error');
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || 'An error occurred during invitation', 'error');
+    } finally {
+      setInviting(false);
+    }
+  };
 
   const filtered = users.filter(u =>
     `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(search.toLowerCase())
@@ -57,7 +102,7 @@ const TeamMembers = () => {
               style={{ paddingLeft: '2.25rem', width: '220px', fontSize: '0.875rem', padding: '0.55rem 0.9rem 0.55rem 2.25rem' }}
             />
           </div>
-          <button className="glass-button primary" onClick={() => showToast('Invite feature coming soon!', 'info')}>
+          <button className="glass-button primary" onClick={() => setShowInviteModal(true)}>
             <Plus size={15} /> Invite Member
           </button>
         </div>
@@ -74,7 +119,7 @@ const TeamMembers = () => {
           <div className="empty-icon"><Users size={32} color="var(--text-muted)" /></div>
           <h3>{search ? 'No members found' : 'No Team Members'}</h3>
           <p>{search ? 'Try a different search term.' : 'Start by inviting members to your organization.'}</p>
-          {!search && <button className="btn btn-primary" onClick={() => showToast('Invite feature coming soon!','info')}><Plus size={16}/> Invite First Member</button>}
+          {!search && <button className="btn btn-primary" onClick={() => setShowInviteModal(true)}><Plus size={16}/> Invite First Member</button>}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -114,6 +159,56 @@ const TeamMembers = () => {
       {toast && (
         <div className="toast-container">
           <div className={`toast toast-${toast.type}`}>{toast.msg}</div>
+        </div>
+      )}
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '450px', padding: '2rem', margin: '1rem', position: 'relative' }}>
+            <button onClick={() => setShowInviteModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={20} /></button>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', fontWeight: 600 }}>Invite Team Member</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>Send an invitation to join your organization.</p>
+            
+            <form onSubmit={handleInviteSubmit}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div className="input-group">
+                  <label className="input-label">First Name</label>
+                  <input type="text" name="firstName" required className="input-field" value={inviteData.firstName} onChange={handleInviteChange} />
+                </div>
+                <div className="input-group">
+                  <label className="input-label">Last Name</label>
+                  <input type="text" name="lastName" required className="input-field" value={inviteData.lastName} onChange={handleInviteChange} />
+                </div>
+              </div>
+              
+              <div className="input-group" style={{ marginBottom: '1rem' }}>
+                <label className="input-label">Email Address</label>
+                <input type="email" name="email" required className="input-field" value={inviteData.email} onChange={handleInviteChange} />
+              </div>
+
+              <div className="input-group" style={{ marginBottom: '1rem' }}>
+                <label className="input-label">Initial Password (Temporary)</label>
+                <input type="password" name="password" required className="input-field" value={inviteData.password} onChange={handleInviteChange} placeholder="Must be at least 8 characters" minLength="8" />
+              </div>
+              
+              <div className="input-group" style={{ marginBottom: '2rem' }}>
+                <label className="input-label">Role Definition</label>
+                <select name="role" className="input-field" value={inviteData.role} onChange={handleInviteChange}>
+                  <option value="ROLE_USER">Standard User</option>
+                  <option value="ROLE_MANAGER">Manager (Creates schedules)</option>
+                  <option value="ROLE_ADMIN">Administrator (Full Access)</option>
+                </select>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowInviteModal(false)} disabled={inviting}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={inviting} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {inviting ? <div className="spinner" style={{width: 16, height: 16}} /> : <Mail size={16} />}
+                  Send Invitation
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
