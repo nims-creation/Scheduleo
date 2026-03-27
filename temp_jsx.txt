@@ -1,0 +1,10 @@
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\App.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\main.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\context\AuthContext.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\pages\Dashboard.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\pages\Home.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\pages\Login.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\pages\Signup.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\pages\dashboard\DashboardHome.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\pages\dashboard\TeamMembers.jsx
+c:\Users\Nims-Creation\Downloads\Schedulo\frontend\src\pages\dashboard\Timetables.jsx
