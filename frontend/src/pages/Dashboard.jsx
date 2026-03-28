@@ -1,7 +1,6 @@
 import React from 'react';
-import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Calendar, Clock, Users, LayoutDashboard, Zap, Layers, Server, Bell, Check, CreditCard } from 'lucide-react';
+import { LogOut, Calendar, Clock, Users, LayoutDashboard, Zap, Layers, Server, Bell, Check, CreditCard, BarChart3, Activity } from 'lucide-react';
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import DashboardHome from './dashboard/DashboardHome';
@@ -13,6 +12,8 @@ import CalendarPage from './dashboard/Calendar';
 import Resources from './dashboard/Resources';
 import Billing from './dashboard/Billing';
 import ProfileSettings from './dashboard/ProfileSettings';
+import ActivityLog from './dashboard/ActivityLog';
+import Reports from './dashboard/Reports';
 
 const NavItem = ({ to, icon: Icon, label, exact }) => {
   const location = useLocation();
@@ -110,6 +111,10 @@ const Dashboard = () => {
           <NavItem to="/dashboard/resources" icon={Server} label="Resources" />
           <NavItem to="/dashboard/billing" icon={CreditCard} label="Billing" />
           <NavItem to="/dashboard/settings" icon={Zap} label="Settings" />
+
+          <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.1em', padding: '1rem 0.5rem 0.25rem' }}>Insights</div>
+          <NavItem to="/dashboard/reports" icon={BarChart3} label="Reports" />
+          <NavItem to="/dashboard/activity" icon={Activity} label="Activity Log" />
         </nav>
 
         {/* User Profile Bubble */}
@@ -223,6 +228,8 @@ const Dashboard = () => {
             <Route path="billing" element={<Billing />} />
             <Route path="settings" element={<OrganizationSettings />} />
             <Route path="profile" element={<ProfileSettings />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="activity" element={<ActivityLog />} />
           </Routes>
         </div>
       </main>

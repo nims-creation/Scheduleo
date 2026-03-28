@@ -5,7 +5,7 @@ import com.saas.Schedulo.dto.request.payment.ProcessPaymentRequest;
 import com.saas.Schedulo.dto.response.PagedResponse;
 import com.saas.Schedulo.dto.response.payment.PaymentResponse;
 
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 import java.util.List;

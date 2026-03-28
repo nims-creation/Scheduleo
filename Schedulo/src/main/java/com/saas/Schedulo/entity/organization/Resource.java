@@ -4,7 +4,7 @@ import com.saas.Schedulo.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+@Entity(name = "OrgResource")
 @Table(name = "resources", indexes = {
         @Index(name = "idx_resource_org", columnList = "organization_id")
 })

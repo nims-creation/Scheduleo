@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@Repository
+@Repository("orgResourceRepository")
 public interface ResourceRepository extends JpaRepository<Resource, UUID> {
     List<Resource> findByOrganizationIdAndIsDeletedFalse(UUID organizationId);
     boolean existsByNameAndOrganizationIdAndIsDeletedFalse(String name, UUID organizationId);
