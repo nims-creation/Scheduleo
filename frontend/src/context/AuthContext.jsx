@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const { data } = await api.post('/auth/login', { email, password });
+      const { data } = await api.post('/api/v1/auth/login', { email, password });
       if (data.success) {
         const { accessToken, refreshToken, user: userData } = data.data;
         localStorage.setItem('accessToken', accessToken);
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Schedulo API payload standard for creating accounts
       const payload = { ...userData, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone };
-      const { data } = await api.post('/auth/signup', payload);
+      const { data } = await api.post('/api/v1/auth/signup', payload);
       if (data.success) {
         const { accessToken, refreshToken, user: newUser } = data.data;
         localStorage.setItem('accessToken', accessToken);

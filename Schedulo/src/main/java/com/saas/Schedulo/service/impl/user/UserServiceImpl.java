@@ -75,6 +75,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public java.util.List<UserResponse> createBulk(java.util.List<CreateUserRequest> requests) {
+        log.info("Creating bulk users: {} requests", requests.size());
+        java.util.List<UserResponse> responses = new java.util.ArrayList<>();
+        for (CreateUserRequest request : requests) {
+            try {
+                if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
+                    log.warn("Skipping existing user email in bulk upload: {}", request.getEmail());
+                    continue;
+                }
+                responses.add(this.create(request));
+            } catch (Exception e) {
+                log.error("Failed to create user {} in bulk upload: {}", request.getEmail(), e.getMessage());
+            }
+        }
+        return responses;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public UserResponse getById(UUID id) {
         User user = userRepository.findById(id)

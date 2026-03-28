@@ -12,6 +12,8 @@ const TeamMembers = () => {
   const [search, setSearch] = useState('');
   const [toast, setToast] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [bulkInput, setBulkInput] = useState('');
   const [inviteData, setInviteData] = useState({
     firstName: '',
     lastName: '',
@@ -68,6 +70,53 @@ const TeamMembers = () => {
     }
   };
 
+  const handleBulkSubmit = async (e) => {
+    e.preventDefault();
+    if (!bulkInput.trim()) return;
+    setInviting(true);
+    
+    try {
+      let requests = [];
+      const lines = bulkInput.split('\n').map(l => l.trim()).filter(Boolean);
+      
+      lines.forEach((line) => {
+         if (line.includes(',')) {
+             const parts = line.split(',').map(p => p.trim());
+             if (parts.length > 0) {
+                 if (parts[1] && parts[1].includes('@')) {
+                     // Comma-separated emails on one line
+                     parts.forEach((p) => {
+                         if (p) requests.push({ email: p, firstName: 'Student', lastName: `${requests.length + 1}`, password: 'Welcome123!', roles: ['ROLE_USER'], organizationId: currentUser?.organization?.id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+                     });
+                 } else {
+                     // CSV formatted: Email, FirstName, LastName
+                     requests.push({ email: parts[0], firstName: parts[1] || 'Student', lastName: parts[2] || `${requests.length + 1}`, password: 'Welcome123!', roles: ['ROLE_USER'], organizationId: currentUser?.organization?.id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+                 }
+             }
+         } else {
+             // Just one email on this line
+             requests.push({ email: line, firstName: 'Student', lastName: `${requests.length + 1}`, password: 'Welcome123!', roles: ['ROLE_USER'], organizationId: currentUser?.organization?.id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+         }
+      });
+
+      if(requests.length === 0) throw new Error("No valid emails found");
+
+      const res = await api.post('/api/v1/users/bulk', requests);
+      if (res.data?.success) {
+        showToast(res.data.message || 'Users bulk imported successfully!');
+        setShowBulkModal(false);
+        setBulkInput('');
+        fetchTeam();
+      } else {
+        showToast('Partial failure during bulk import', 'error');
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || err.message || 'An error occurred during bulk import', 'error');
+    } finally {
+      setInviting(false);
+    }
+  };
+
   const filtered = users.filter(u =>
     `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(search.toLowerCase())
   );
@@ -102,6 +151,9 @@ const TeamMembers = () => {
               style={{ paddingLeft: '2.25rem', width: '220px', fontSize: '0.875rem', padding: '0.55rem 0.9rem 0.55rem 2.25rem' }}
             />
           </div>
+          <button className="glass-button" style={{ marginRight: '0.5rem', background: 'rgba(255,255,255,0.05)' }} onClick={() => setShowBulkModal(true)}>
+            <Users size={15} /> Bulk Import
+          </button>
           <button className="glass-button primary" onClick={() => setShowInviteModal(true)}>
             <Plus size={15} /> Invite Member
           </button>
@@ -205,6 +257,45 @@ const TeamMembers = () => {
                 <button type="submit" className="btn btn-primary" disabled={inviting} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   {inviting ? <div className="spinner" style={{width: 16, height: 16}} /> : <Mail size={16} />}
                   Send Invitation
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Import Modal */}
+      {showBulkModal && (
+        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '600px', padding: '2.5rem', margin: '1rem', position: 'relative' }}>
+            <button onClick={() => setShowBulkModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={20} /></button>
+            <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', fontWeight: 600, fontFamily: 'Outfit' }}>Bulk Import Students</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+              Paste a list of emails (separated by commas or new lines), or paste CSV data in the format:<br/> <code>Email, FirstName, LastName</code>
+            </p>
+            
+            <form onSubmit={handleBulkSubmit}>
+              <div className="input-group" style={{ marginBottom: '1.5rem' }}>
+                <textarea 
+                  className="input-field" 
+                  rows="8" 
+                  placeholder="student1@college.edu, Jane, Doe&#10;student2@college.edu, John, Smith&#10;student3@college.edu"
+                  value={bulkInput}
+                  onChange={e => setBulkInput(e.target.value)}
+                  style={{ fontFamily: 'monospace', resize: 'vertical' }}
+                  required
+                />
+              </div>
+              
+              <div style={{ padding: '1rem', background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.3)', borderRadius: '0.5rem', marginBottom: '2rem', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                <strong>Note:</strong> All imported users will be assigned the <code>ROLE_USER</code> (Student) role and given a default password <code>Welcome123!</code> which they should change upon next login.
+              </div>
+              
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowBulkModal(false)} disabled={inviting}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={inviting} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {inviting ? <div className="spinner" style={{width: 16, height: 16}} /> : <Users size={16} />}
+                  Import Users
                 </button>
               </div>
             </form>

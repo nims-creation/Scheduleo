@@ -8,9 +8,33 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [toast, setToast] = useState(null);
   
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if(!forgotEmail) return;
+    setForgotLoading(true);
+    try {
+      // Need to import api if it wasn't here, but wait, api is not imported in Login.jsx?
+      // Wait, is api imported? Let's check imports. No, it's not. I will add import dynamically.
+      const api = (await import('../services/api')).default;
+      await api.post(`/api/v1/auth/forgot-password?email=${encodeURIComponent(forgotEmail)}`);
+      setToast({ msg: 'If the email exists, a reset link has been sent.', type: 'success' });
+      setShowForgotModal(false);
+      setForgotEmail('');
+    } catch (err) {
+      setToast({ msg: 'Failed to initiate password reset.', type: 'error' });
+    } finally {
+      setForgotLoading(false);
+      setTimeout(() => setToast(null), 3000);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -71,7 +95,7 @@ const Login = () => {
           <div className="input-group">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <label className="input-label">Password</label>
-              <a href="#" style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', textDecoration: 'none' }}>Forgot password?</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); setShowForgotModal(true); }} style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', textDecoration: 'none' }}>Forgot password?</a>
             </div>
             <div style={{ position: 'relative' }}>
               <Lock style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
@@ -101,6 +125,42 @@ const Login = () => {
           Don't have an account? <Link to="/signup" style={{ color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: '500' }}>Sign up</Link>
         </div>
       </div>
+
+      {showForgotModal && (
+        <div className="modal-overlay">
+          <div className="modal-box" style={{ padding: '2.5rem', position: 'relative' }}>
+            <button onClick={() => setShowForgotModal(false)} className="modal-close" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>✕</button>
+            <h3 className="modal-title" style={{ marginBottom: '0.5rem' }}>Reset Password</h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>Enter your email address and we'll send you a link to reset your password.</p>
+            <form onSubmit={handleForgotPassword}>
+              <div className="input-group">
+                <input 
+                  type="email" 
+                  required 
+                  className="input-field" 
+                  placeholder="you@company.com"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                />
+              </div>
+              <button 
+                type="submit" 
+                className="btn btn-primary" 
+                style={{ width: '100%', marginTop: '0.5rem' }}
+                disabled={forgotLoading}
+              >
+                {forgotLoading ? <Loader2 className="animate-spin" size={20} /> : 'Send Reset Link'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div className="toast-container">
+          <div className={`toast toast-${toast.type}`}>{toast.msg}</div>
+        </div>
+      )}
     </div>
   );
 };

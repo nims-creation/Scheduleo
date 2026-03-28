@@ -8,22 +8,32 @@ const Billing = () => {
   const [billingCycle, setBillingCycle] = useState('MONTHLY');
   const [loading, setLoading] = useState(true);
 
-  // Fallback plans if backend returns empty (before seeding)
+  // Fallback plans
   const defaultPlans = [
-    { code: 'FREE', name: 'Free', description: 'For small teams getting started', monthlyPrice: 0, yearlyPrice: 0, maxUsers: 10, maxSchedulesPerDay: 50, planType: 'FREE' },
-    { code: 'PRO', name: 'Professional', description: 'For growing organizations needing full power', monthlyPrice: 49, yearlyPrice: 490, maxUsers: 50, maxSchedulesPerDay: 500, planType: 'PROFESSIONAL', isPopular: true },
-    { code: 'ENTERPRISE', name: 'Enterprise', description: 'Unlimited everything for large-scale operations', monthlyPrice: 199, yearlyPrice: 1990, maxUsers: 9999, maxSchedulesPerDay: 9999, planType: 'ENTERPRISE' }
+    { code: 'FREE', name: 'Free', description: 'For small teams getting started', monthlyPrice: 0, quarterlyPrice: 0, yearlyPrice: 0, maxUsers: 10, maxSchedulesPerDay: 50, planType: 'FREE' },
+    { code: 'PRO', name: 'Professional', description: 'For growing organizations needing full power', monthlyPrice: 50, quarterlyPrice: 180, yearlyPrice: 500, maxUsers: 50, maxSchedulesPerDay: 500, planType: 'PROFESSIONAL', isPopular: true },
+    { code: 'ENTERPRISE', name: 'Enterprise', description: 'Unlimited everything for large-scale operations', monthlyPrice: 150, quarterlyPrice: 500, yearlyPrice: 1500, maxUsers: 9999, maxSchedulesPerDay: 9999, planType: 'ENTERPRISE' }
   ];
 
   const fetchBillingData = async () => {
     try {
       setLoading(true);
       const [plansRes, subRes] = await Promise.all([
-        api.get('/subscriptions/plans').catch(() => ({ data: { data: [] } })),
-        api.get('/subscriptions/current').catch(() => ({ data: { data: null } }))
+        api.get('/api/v1/subscriptions/plans').catch(() => ({ data: { data: [] } })),
+        api.get('/api/v1/subscriptions/current').catch(() => ({ data: { data: null } }))
       ]);
       
-      const latestPlans = (plansRes.data?.data && plansRes.data.data.length > 0) ? plansRes.data.data : defaultPlans;
+      const latestPlans = (plansRes.data?.data && plansRes.data.data.length > 0) 
+        ? plansRes.data.data.map(p => {
+            if (p.code === 'PRO' || p.planType === 'PROFESSIONAL') {
+              return { ...p, monthlyPrice: 50, quarterlyPrice: 180, yearlyPrice: 500 };
+            }
+            if (p.code === 'ENTERPRISE' || p.planType === 'ENTERPRISE') {
+              return { ...p, monthlyPrice: 150, quarterlyPrice: 500, yearlyPrice: 1500 };
+            }
+            return { ...p, quarterlyPrice: p.quarterlyPrice || 0 };
+          }) 
+        : defaultPlans;
       setPlans(latestPlans);
       setCurrentSubscription(subRes.data?.data);
     } catch (err) {
@@ -41,7 +51,7 @@ const Billing = () => {
   const handleUpgrade = async (planCode) => {
     try {
       if(window.confirm(`Are you sure you want to upgrade to ${planCode} on a ${billingCycle} cycle?`)){
-          await api.post('/subscriptions/upgrade', {
+          await api.post('/api/v1/subscriptions/upgrade', {
             planCode,
             billingCycle
           });
@@ -99,7 +109,7 @@ const Billing = () => {
 
             <div style={{ flex: 1, minWidth: '200px' }}>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Amount</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>${currentSubscription.amount || 0}</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>₹{currentSubscription.amount || 0}</div>
             </div>
           </div>
         ) : (
@@ -119,10 +129,16 @@ const Billing = () => {
             Monthly
           </button>
           <button 
+            onClick={() => setBillingCycle('QUARTERLY')}
+            style={{ padding: '0.5rem 1.5rem', borderRadius: '2rem', border: 'none', background: billingCycle === 'QUARTERLY' ? 'var(--brand-primary)' : 'transparent', color: billingCycle === 'QUARTERLY' ? 'white' : 'var(--text-primary)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+          >
+            Quarterly
+          </button>
+          <button 
             onClick={() => setBillingCycle('YEARLY')}
             style={{ padding: '0.5rem 1.5rem', borderRadius: '2rem', border: 'none', background: billingCycle === 'YEARLY' ? 'var(--brand-primary)' : 'transparent', color: billingCycle === 'YEARLY' ? 'white' : 'var(--text-primary)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
           >
-            Yearly <span style={{ fontSize: '0.7rem', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '10px', marginLeft: '4px' }}>Save 15%</span>
+            Yearly <span style={{ fontSize: '0.7rem', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '10px', marginLeft: '4px' }}>Save!</span>
           </button>
         </div>
       </div>
@@ -148,9 +164,11 @@ const Billing = () => {
             
             <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
               <span style={{ fontSize: '2.5rem', fontWeight: 800 }}>
-                ${billingCycle === 'YEARLY' && plan.yearlyPrice > 0 ? plan.yearlyPrice / 12 : plan.monthlyPrice}
+                ₹{billingCycle === 'YEARLY' ? plan.yearlyPrice : billingCycle === 'QUARTERLY' ? plan.quarterlyPrice : plan.monthlyPrice}
               </span>
-              <span style={{ color: 'var(--text-muted)' }}>/mo</span>
+              <span style={{ color: 'var(--text-muted)' }}>
+                /{billingCycle === 'MONTHLY' ? 'mo' : billingCycle === 'QUARTERLY' ? 'quarter' : 'yr'}
+              </span>
             </div>
             
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>

@@ -19,6 +19,7 @@ public class SubscriptionPlanResponse {
     private String code;
     private String description;
     private BigDecimal monthlyPrice;
+    private BigDecimal quarterlyPrice;
     private BigDecimal yearlyPrice;
     private SubscriptionPlan.PlanType planType;
     private Integer maxUsers;

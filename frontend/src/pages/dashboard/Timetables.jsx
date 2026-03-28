@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { Calendar, Clock, Plus, Zap, Eye, Archive, CheckCircle, Trash2, X, ChevronRight } from 'lucide-react';
 
@@ -85,6 +85,17 @@ const Timetables = () => {
     catch (e) { showToast('Archive failed', 'error'); }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to permanently delete this timetable?")) return;
+    try { 
+      await api.delete(`/api/v1/timetables/${id}`); 
+      showToast('Timetable deleted forever'); 
+      fetchTimetables(); 
+      if (selected?.id === id) setSelected(null); 
+    }
+    catch (e) { showToast(e.response?.data?.message || 'Delete failed', 'error'); }
+  };
+
   const getStatusBadge = (tt) => {
     const s = tt.status || 'DRAFT';
     const map = { PUBLISHED: 'badge-published', DRAFT: 'badge-draft', ARCHIVED: 'badge-archived' };
@@ -136,8 +147,18 @@ const Timetables = () => {
                   <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1, marginRight: '0.5rem' }}>{tt.name}</div>
                   {getStatusBadge(tt)}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <Clock size={11} /> {new Date(tt.createdAt).toLocaleDateString()}
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Clock size={11} /> {new Date(tt.createdAt).toLocaleDateString()}
+                  </span>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleDelete(tt.id); }}
+                    className="icon-button"
+                    style={{ background: 'transparent', border: 'none', color: 'var(--brand-danger)', cursor: 'pointer', padding: '0.15rem' }}
+                    title="Delete Timetable"
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
               </div>
             ))
@@ -178,6 +199,9 @@ const Timetables = () => {
                 )}
                 <button className="glass-button danger btn-sm" onClick={() => handleArchive(selected.id)}>
                   <Archive size={14} /> Archive
+                </button>
+                <button className="glass-button danger btn-sm" style={{ background: 'rgba(247, 79, 110, 0.15)' }} onClick={() => handleDelete(selected.id)}>
+                  <Trash2 size={14} /> Delete
                 </button>
                 <button className="glass-button btn-sm" onClick={() => setSelected(null)}>
                   <X size={14} /> Close

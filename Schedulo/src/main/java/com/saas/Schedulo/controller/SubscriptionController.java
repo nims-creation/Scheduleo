@@ -43,7 +43,7 @@ public class SubscriptionController {
 
     @PostMapping("/upgrade")
     @Operation(summary = "Upgrade organization subscription")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<SubscriptionResponse>> upgradeSubscription(
             @Valid @RequestBody UpgradeSubscriptionRequest request,
             @CurrentUser CustomUserDetails currentUser) {

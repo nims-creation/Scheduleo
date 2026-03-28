@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public interface UserService {
     UserResponse create(CreateUserRequest request);
+    java.util.List<UserResponse> createBulk(java.util.List<CreateUserRequest> requests);
     UserResponse getById(UUID id);
     UserResponse update(UUID id, UpdateUserRequest request);
     void delete(UUID id);

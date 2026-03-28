@@ -40,6 +40,16 @@ public class UserController {
                 .body(ApiResponse.success(response, "User created successfully"));
     }
 
+    @PostMapping("/bulk")
+    @Operation(summary = "Bulk create users", description = "Create multiple new users within an organization via batch upload")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public ResponseEntity<ApiResponse<java.util.List<UserResponse>>> createBulk(
+            @Valid @RequestBody java.util.List<CreateUserRequest> requests) {
+        java.util.List<UserResponse> responses = userService.createBulk(requests);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(responses, "Successfully imported " + responses.size() + " users."));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID", description = "Get detailed information about a user")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') or @securityService.isSelf(authentication, #id)")

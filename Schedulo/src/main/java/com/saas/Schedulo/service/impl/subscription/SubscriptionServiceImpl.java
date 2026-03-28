@@ -8,8 +8,8 @@ import com.saas.Schedulo.entity.subscription.Subscription;
 import com.saas.Schedulo.entity.subscription.SubscriptionPlan;
 import com.saas.Schedulo.exception.resource.ResourceNotFoundException;
 import com.saas.Schedulo.repository.organization.OrganizationRepository;
-import com.saas.Schedulo.repository.subscription.SubscriptionPlanRepository;
-import com.saas.Schedulo.repository.subscription.SubscriptionRepository;
+import com.saas.Schedulo.repository.payment.SubscriptionPlanRepository;
+import com.saas.Schedulo.repository.payment.SubscriptionRepository;
 import com.saas.Schedulo.service.subscription.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @Transactional(readOnly = true)
     public List<SubscriptionPlanResponse> getAvailablePlans() {
-        return planRepository.findAllByOrderBySortOrderAsc().stream()
+        return planRepository.findAllActiveOrdered().stream()
                 .map(this::mapToPlanResponse)
                 .collect(Collectors.toList());
     }
@@ -101,6 +101,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .code(plan.getCode())
                 .description(plan.getDescription())
                 .monthlyPrice(plan.getMonthlyPrice())
+                .quarterlyPrice(plan.getQuarterlyPrice())
                 .yearlyPrice(plan.getYearlyPrice())
                 .planType(plan.getPlanType())
                 .maxUsers(plan.getMaxUsers())

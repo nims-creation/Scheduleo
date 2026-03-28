@@ -38,7 +38,7 @@ public class TimetableController {
 
     @PostMapping
     @Operation(summary = "Create timetable", description = "Create a new timetable")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<TimetableResponse>> create(
             @Valid @RequestBody CreateTimetableRequest request,
             @CurrentUser CustomUserDetails currentUser) {
@@ -56,7 +56,7 @@ public class TimetableController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update timetable", description = "Update an existing timetable")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<TimetableResponse>> update(
             @PathVariable UUID id,
             @Valid @RequestBody CreateTimetableRequest request) {
@@ -66,7 +66,7 @@ public class TimetableController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete timetable", description = "Delete a timetable")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         timetableService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null, "Timetable deleted successfully"));
@@ -84,7 +84,7 @@ public class TimetableController {
 
     @PostMapping("/{id}/generate")
     @Operation(summary = "Generate timetable entries", description = "Automatically generates a timetable based on class requirements and resources")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<List<ScheduleEntryResponse>>> generateTimetable(
             @PathVariable UUID id,
             @Valid @RequestBody GenerateTimetableRequest request) {
@@ -109,7 +109,7 @@ public class TimetableController {
 
     @PostMapping("/{id}/publish")
     @Operation(summary = "Publish timetable", description = "Publish a timetable")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<TimetableResponse>> publish(@PathVariable UUID id) {
         TimetableResponse response = timetableService.publish(id);
         return ResponseEntity.ok(ApiResponse.success(response, "Timetable published successfully"));
@@ -117,7 +117,7 @@ public class TimetableController {
 
     @PostMapping("/{id}/archive")
     @Operation(summary = "Archive timetable", description = "Archive a timetable")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<TimetableResponse>> archive(@PathVariable UUID id) {
         TimetableResponse response = timetableService.archive(id);
         return ResponseEntity.ok(ApiResponse.success(response, "Timetable archived successfully"));
@@ -125,7 +125,7 @@ public class TimetableController {
 
     @PostMapping("/{id}/duplicate-template")
     @Operation(summary = "Create template", description = "Create a template from existing timetable")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<TimetableResponse>> duplicateAsTemplate(
             @PathVariable UUID id,
             @RequestParam String templateName) {
@@ -136,7 +136,7 @@ public class TimetableController {
 
     @PostMapping("/from-template/{templateId}")
     @Operation(summary = "Create from template", description = "Create new timetable from template")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<TimetableResponse>> createFromTemplate(
             @PathVariable UUID templateId,
             @Valid @RequestBody CreateTimetableRequest request) {
