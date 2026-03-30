@@ -126,13 +126,20 @@ public class CalendarController {
 
     @PostMapping("/holidays")
     @Operation(summary = "Create holiday")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<HolidayResponse>> createHoliday(
             @CurrentUser CustomUserDetails currentUser,
             @Valid @RequestBody CreateHolidayRequest request) {
-        Organization organization = organizationRepository.findById(currentUser.getOrganizationId())
-                .orElseThrow(() -> new ResourceNotFoundException("Organization", "id",
-                        currentUser.getOrganizationId().toString()));
+        
+        UUID orgId = currentUser.getOrganizationId();
+        if (orgId == null) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("You must belong to an organization to add holidays.",
+                            ApiResponse.ErrorDetails.builder().code("NO_ORGANIZATION").description("User has no organization linked").build()));
+        }
+        
+        Organization organization = organizationRepository.findById(orgId)
+                .orElseThrow(() -> new ResourceNotFoundException("Organization", "id", orgId.toString()));
 
         Holiday holiday = Holiday.builder()
                 .name(request.getName())
@@ -144,6 +151,8 @@ public class CalendarController {
                 .applicableTo(request.getApplicableTo())
                 .organization(organization)
                 .build();
+        holiday.setIsActive(true);
+        holiday.setIsDeleted(false);
 
         Holiday saved = holidayRepository.save(holiday);
 

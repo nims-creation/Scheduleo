@@ -50,6 +50,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithToken = async (token) => {
+    try {
+      localStorage.setItem('accessToken', token);
+      
+      // Fetch user profile
+      const { data } = await api.get('/api/v1/users/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (data.success) {
+        const userData = data.data;
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+        return { success: true };
+      }
+      return { success: false, error: data.message };
+    } catch (err) {
+      console.error('OAuth token validation failed:', err);
+      localStorage.removeItem('accessToken');
+      return { success: false, error: 'Failed to process OAuth token' };
+    }
+  };
+
   const signup = async (userData) => {
     try {
       // Schedulo API payload standard for creating accounts
@@ -89,7 +112,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, loginWithToken, signup, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

@@ -99,7 +99,7 @@ const ProfileSettings = () => {
                    {user?.firstName?.charAt(0) || ''}{user?.lastName?.charAt(0) || ''}
                 </div>
                 <div>
-                  <button type="button" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+                  <button type="button" className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
                     <Camera size={16} /> Upload New Photo
                   </button>
                   <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>At least 256x256 PNG or JPG.</p>
@@ -107,52 +107,39 @@ const ProfileSettings = () => {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                <div className="form-group">
-                  <label className="form-label">First Name</label>
-                  <div className="input-with-icon">
-                    <User className="input-icon" size={18} />
-                    <input type="text" className="form-input" name="firstName" value={formData.firstName} onChange={handleInputChange} required />
-                  </div>
+                <div className="input-group">
+                  <label className="input-label">First Name</label>
+                  <input type="text" className="input-field" name="firstName" value={formData.firstName} onChange={handleInputChange} required />
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Last Name</label>
-                  <div className="input-with-icon">
-                    <User className="input-icon" size={18} />
-                    <input type="text" className="form-input" name="lastName" value={formData.lastName} onChange={handleInputChange} required />
-                  </div>
+                <div className="input-group">
+                  <label className="input-label">Last Name</label>
+                  <input type="text" className="input-field" name="lastName" value={formData.lastName} onChange={handleInputChange} required />
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                <label className="form-label">Email Address <span style={{ color: 'var(--text-muted)', fontWeight: 400, marginLeft: '0.5rem' }}>(Read Only)</span></label>
-                <div className="input-with-icon">
-                  <Mail className="input-icon" size={18} />
-                  <input type="email" className="form-input" value={user?.email || ''} readOnly style={{ opacity: 0.7, cursor: 'not-allowed' }} />
-                </div>
+              <div className="input-group">
+                <label className="input-label">Email Address <span style={{ color: 'var(--text-muted)', fontWeight: 400, marginLeft: '0.5rem', fontSize: '0.78rem' }}>(Read Only)</span></label>
+                <input type="email" className="input-field" value={user?.email || ''} readOnly style={{ opacity: 0.6, cursor: 'not-allowed' }} />
               </div>
 
-              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                <label className="form-label">Phone Number</label>
-                <div className="input-with-icon">
-                  <Phone className="input-icon" size={18} />
-                  <input type="tel" className="form-input" name="phoneNumber" value={formData.phoneNumber || ''} onChange={handleInputChange} placeholder="+1 (555) 000-0000" />
-                </div>
+              <div className="input-group">
+                <label className="input-label">Phone Number</label>
+                <input type="tel" className="input-field" name="phoneNumber" value={formData.phoneNumber || ''} onChange={handleInputChange} placeholder="+1 (555) 000-0000" />
               </div>
 
-              <div className="form-group" style={{ marginBottom: '2rem' }}>
-                <label className="form-label">Timezone</label>
-                <div className="input-with-icon">
-                  <MapPin className="input-icon" size={18} />
-                  <select className="form-input" name="timezone" value={formData.timezone} onChange={handleInputChange}>
-                    <option value="UTC">UTC (Universal Time)</option>
-                    <option value="America/New_York">Eastern Time (ET)</option>
-                    <option value="America/Chicago">Central Time (CT)</option>
-                    <option value="America/Denver">Mountain Time (MT)</option>
-                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                    <option value="Europe/London">London (GMT)</option>
-                    <option value="Asia/Tokyo">Tokyo (JST)</option>
-                  </select>
-                </div>
+              <div className="input-group" style={{ marginBottom: '2rem' }}>
+                <label className="input-label">Timezone</label>
+                <select className="input-field" name="timezone" value={formData.timezone} onChange={handleInputChange} style={{ cursor: 'pointer' }}>
+                  <option value="UTC">UTC (Universal Time)</option>
+                  <option value="Asia/Kolkata">India (IST +5:30)</option>
+                  <option value="America/New_York">Eastern Time (ET)</option>
+                  <option value="America/Chicago">Central Time (CT)</option>
+                  <option value="America/Denver">Mountain Time (MT)</option>
+                  <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                  <option value="Europe/London">London (GMT)</option>
+                  <option value="Asia/Tokyo">Tokyo (JST)</option>
+                  <option value="Asia/Dubai">Dubai (GST +4)</option>
+                </select>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
@@ -167,28 +154,19 @@ const ProfileSettings = () => {
             <div>
               <h3 style={{ margin: '0 0 1.5rem', fontSize: '1.1rem' }}>Change Password</h3>
               <form onSubmit={(e) => { e.preventDefault(); alert("Password change workflow is disabled for demo."); }}>
-                <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                  <label className="form-label">Current Password</label>
-                  <div className="input-with-icon">
-                    <Lock className="input-icon" size={18} />
-                    <input type="password" className="form-input" placeholder="••••••••" />
-                  </div>
+                <div className="input-group">
+                  <label className="input-label">Current Password</label>
+                  <input type="password" className="input-field" placeholder="••••••••" />
                 </div>
 
-                <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                  <label className="form-label">New Password</label>
-                  <div className="input-with-icon">
-                    <Lock className="input-icon" size={18} />
-                    <input type="password" className="form-input" placeholder="••••••••" />
-                  </div>
+                <div className="input-group">
+                  <label className="input-label">New Password</label>
+                  <input type="password" className="input-field" placeholder="••••••••" />
                 </div>
 
-                <div className="form-group" style={{ marginBottom: '2rem' }}>
-                  <label className="form-label">Confirm New Password</label>
-                  <div className="input-with-icon">
-                    <Lock className="input-icon" size={18} />
-                    <input type="password" className="form-input" placeholder="••••••••" />
-                  </div>
+                <div className="input-group" style={{ marginBottom: '2rem' }}>
+                  <label className="input-label">Confirm New Password</label>
+                  <input type="password" className="input-field" placeholder="••••••••" />
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>

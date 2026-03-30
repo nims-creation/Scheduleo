@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -24,6 +25,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
       <Route 
         path="/dashboard/*" 
         element={

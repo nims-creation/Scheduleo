@@ -34,7 +34,12 @@ public class UserController {
     @PostMapping
     @Operation(summary = "Create user", description = "Create a new user within an organization")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    public ResponseEntity<ApiResponse<UserResponse>> create(@Valid @RequestBody CreateUserRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> create(
+            @CurrentUser CustomUserDetails currentUser,
+            @Valid @RequestBody CreateUserRequest request) {
+        
+        request.setOrganizationId(currentUser.getOrganizationId());
+        
         UserResponse response = userService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "User created successfully"));
@@ -44,7 +49,12 @@ public class UserController {
     @Operation(summary = "Bulk create users", description = "Create multiple new users within an organization via batch upload")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponse<java.util.List<UserResponse>>> createBulk(
+            @CurrentUser CustomUserDetails currentUser,
             @Valid @RequestBody java.util.List<CreateUserRequest> requests) {
+        
+        // Ensure all users are created in the current user's organization
+        requests.forEach(req -> req.setOrganizationId(currentUser.getOrganizationId()));
+        
         java.util.List<UserResponse> responses = userService.createBulk(requests);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(responses, "Successfully imported " + responses.size() + " users."));
