@@ -2,11 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { CreditCard, CheckCircle2, AlertCircle } from 'lucide-react';
 import api from '../../services/api';
 
+const CURRENCIES = {
+  INR: { symbol: '₹', rate: 1 },
+  USD: { symbol: '$', rate: 0.012 },
+  EUR: { symbol: '€', rate: 0.011 },
+  GBP: { symbol: '£', rate: 0.0094 },
+  JPY: { symbol: '¥', rate: 1.8 }
+};
+
+const formatPrice = (amount, currencyCode) => {
+  if (amount == null) return '0';
+  const curr = CURRENCIES[currencyCode] || CURRENCIES.INR;
+  const converted = amount * curr.rate;
+  return converted.toFixed(currencyCode === 'JPY' || currencyCode === 'INR' ? 0 : 2);
+};
+
 const Billing = () => {
   const [plans, setPlans] = useState([]);
   const [currentSubscription, setCurrentSubscription] = useState(null);
   const [billingCycle, setBillingCycle] = useState('MONTHLY');
   const [loading, setLoading] = useState(true);
+  const [currency, setCurrency] = useState(() => localStorage.getItem('billingCurrency') || 'INR');
+
+  useEffect(() => {
+    localStorage.setItem('billingCurrency', currency);
+  }, [currency]);
 
   // Fallback plans
   const defaultPlans = [
@@ -79,6 +99,18 @@ const Billing = () => {
           </h1>
           <p style={{ color: 'var(--text-muted)', margin: 0 }}>Manage your organization's plan and payment methods.</p>
         </div>
+        <div>
+          <select 
+            className="input-field" 
+            style={{ width: 'auto', display: 'inline-block', fontWeight: 600, padding: '0.4rem 2rem 0.4rem 1rem' }}
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+          >
+            {Object.keys(CURRENCIES).map(c => (
+              <option key={c} value={c}>{c} ({CURRENCIES[c].symbol})</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', padding: '2rem', marginBottom: '2rem' }}>
@@ -109,7 +141,7 @@ const Billing = () => {
 
             <div style={{ flex: 1, minWidth: '200px' }}>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Amount</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>₹{currentSubscription.amount || 0}</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{CURRENCIES[currency]?.symbol}{formatPrice(currentSubscription.amount || 0, currency)}</div>
             </div>
           </div>
         ) : (
@@ -164,7 +196,7 @@ const Billing = () => {
             
             <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
               <span style={{ fontSize: '2.5rem', fontWeight: 800 }}>
-                ₹{billingCycle === 'YEARLY' ? plan.yearlyPrice : billingCycle === 'QUARTERLY' ? plan.quarterlyPrice : plan.monthlyPrice}
+                {CURRENCIES[currency]?.symbol}{formatPrice(billingCycle === 'YEARLY' ? plan.yearlyPrice : billingCycle === 'QUARTERLY' ? plan.quarterlyPrice : plan.monthlyPrice, currency)}
               </span>
               <span style={{ color: 'var(--text-muted)' }}>
                 /{billingCycle === 'MONTHLY' ? 'mo' : billingCycle === 'QUARTERLY' ? 'quarter' : 'yr'}

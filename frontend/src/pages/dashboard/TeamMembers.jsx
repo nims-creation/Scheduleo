@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Users, Mail, Phone, Calendar, Plus, Search, Shield, X, CheckCircle } from 'lucide-react';
+import { Users, Mail, Phone, Calendar, Plus, Search, Shield, X, CheckCircle, Upload } from 'lucide-react';
 
 const ROLE_COLORS = { ADMIN: { bg: 'rgba(247,79,110,0.15)', color: 'var(--brand-danger)' }, MANAGER: { bg: 'rgba(79,142,247,0.15)', color: 'var(--brand-primary)' }, MEMBER: { bg: 'rgba(155,114,247,0.15)', color: 'var(--brand-secondary)' } };
 
@@ -115,6 +115,20 @@ const TeamMembers = () => {
     } finally {
       setInviting(false);
     }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target.result;
+      // Strip out the CSV header if it looks like one, or just append
+      // In this case, just appending it and letting the backend or split logic handle it is fine
+      setBulkInput(prev => prev ? prev + '\\n' + content : content);
+    };
+    reader.readAsText(file);
+    e.target.value = null; // reset so same file can be uploaded again if needed
   };
 
   const filtered = users.filter(u =>
@@ -275,6 +289,13 @@ const TeamMembers = () => {
             </p>
             
             <form onSubmit={handleBulkSubmit}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Or automatically load from file:</span>
+                <label className="glass-button btn-sm" style={{ cursor: 'pointer', fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Upload size={14} /> Upload CSV
+                  <input type="file" accept=".csv" onChange={handleFileUpload} style={{ display: 'none' }} />
+                </label>
+              </div>
               <div className="input-group" style={{ marginBottom: '1.5rem' }}>
                 <textarea 
                   className="input-field" 
