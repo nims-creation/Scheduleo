@@ -2,14 +2,23 @@ package com.saas.Schedulo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+        ElasticsearchDataAutoConfiguration.class,
+        ElasticsearchRepositoriesAutoConfiguration.class,
+        ElasticsearchClientAutoConfiguration.class,
+        ElasticsearchRestClientAutoConfiguration.class
+})
 @EnableJpaAuditing(auditorAwareRef = "auditorAwareImpl")
 public class ScheduloApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ScheduloApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ScheduloApplication.class, args);
+    }
 
 }

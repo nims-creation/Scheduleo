@@ -90,7 +90,7 @@ public class ScheduleEntry extends BaseEntity {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    @Column(name = "metadata", columnDefinition = "JSON")
+    @Column(name = "metadata", columnDefinition = "TEXT")
     private String metadata;
 
     public enum EntryType {
