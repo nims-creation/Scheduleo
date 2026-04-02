@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CreditCard, CheckCircle2, AlertCircle, X, Lock } from 'lucide-react';
 import api from '../../services/api';
 
 const CURRENCIES = {
@@ -23,6 +23,10 @@ const Billing = () => {
   const [billingCycle, setBillingCycle] = useState('MONTHLY');
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState(() => localStorage.getItem('billingCurrency') || 'INR');
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPlanDetails, setSelectedPlanDetails] = useState(null);
+  const [paymentForm, setPaymentForm] = useState({ number: '', expiry: '', cvc: '', name: '' });
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('billingCurrency', currency);
@@ -68,18 +72,57 @@ const Billing = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleUpgrade = async (planCode) => {
+  const initiateCheckout = (planCode) => {
+    const plan = plans.find(p => p.code === planCode);
+    if (!plan) return;
+    const amount = billingCycle === 'YEARLY' ? plan.yearlyPrice : billingCycle === 'QUARTERLY' ? plan.quarterlyPrice : plan.monthlyPrice;
+    
+    // Free plan upgrade doesn't need payment
+    if (amount === 0 || planCode === 'FREE') {
+      processFreeUpgrade(planCode);
+      return;
+    }
+    
+    setSelectedPlanDetails({ code: plan.code, name: plan.name, amount });
+    setShowPaymentModal(true);
+  };
+
+  const processFreeUpgrade = async (planCode) => {
     try {
-      if(window.confirm(`Are you sure you want to upgrade to ${planCode} on a ${billingCycle} cycle?`)){
-          await api.post('/api/v1/subscriptions/upgrade', {
-            planCode,
-            billingCycle
-          });
-          alert('Subscription upgraded successfully!');
-          fetchBillingData();
-      }
+      await api.post('/api/v1/subscriptions/upgrade', { planCode, billingCycle });
+      alert('Subscription changed successfully!');
+      fetchBillingData();
     } catch (err) {
-      alert('Error upgrading subscription. Please try again.');
+      alert('Error updating subscription.');
+    }
+  };
+
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    setProcessingPayment(true);
+    try {
+      // 1. Process payment via backend (simulating Stripe pm_card_visa)
+      await api.post('/api/v1/payments', {
+        amount: selectedPlanDetails.amount,
+        currency: currency,
+        paymentMethodId: 'pm_card_visa',
+        description: `Upgrade to ${selectedPlanDetails.name}`
+      });
+
+      // 2. Upgrade the subscription
+      await api.post('/api/v1/subscriptions/upgrade', {
+        planCode: selectedPlanDetails.code,
+        billingCycle
+      });
+
+      alert('Payment successful & Subscription upgraded!');
+      setShowPaymentModal(false);
+      setPaymentForm({ number: '', expiry: '', cvc: '', name: '' });
+      fetchBillingData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Payment failed. Please try again.');
+    } finally {
+      setProcessingPayment(false);
     }
   };
 
@@ -220,7 +263,7 @@ const Billing = () => {
 
             <button 
               disabled={currentPlanCode === plan.code && currentSubscription?.billingCycle === billingCycle}
-              onClick={() => handleUpgrade(plan.code)}
+              onClick={() => initiateCheckout(plan.code)}
               className={`btn ${plan.isPopular ? 'btn-primary' : 'btn-outline'}`}
               style={{ width: '100%', padding: '0.75rem', fontSize: '1rem' }}
             >
@@ -230,6 +273,49 @@ const Billing = () => {
           </div>
         ))}
       </div>
+
+      {showPaymentModal && selectedPlanDetails && (
+        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '400px', padding: '2rem', margin: '1rem', position: 'relative' }}>
+            <button onClick={() => setShowPaymentModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={20} /></button>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', fontWeight: 600 }}>Complete Payment</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+              You are upgrading to <strong>{selectedPlanDetails.name}</strong>.
+              <br/>Total due: <strong>{CURRENCIES[currency]?.symbol}{formatPrice(selectedPlanDetails.amount, currency)}</strong>
+            </p>
+            
+            <form onSubmit={handlePaymentSubmit}>
+              <div className="input-group" style={{ marginBottom: '1rem' }}>
+                <label className="input-label">Cardholder Name</label>
+                <input type="text" className="input-field" placeholder="Jane Doe" required 
+                  value={paymentForm.name} onChange={e => setPaymentForm({...paymentForm, name: e.target.value})} />
+              </div>
+              <div className="input-group" style={{ marginBottom: '1rem' }}>
+                <label className="input-label">Card Number</label>
+                <input type="text" className="input-field" placeholder="4242 4242 4242 4242" required maxLength="19"
+                  value={paymentForm.number} onChange={e => setPaymentForm({...paymentForm, number: e.target.value})} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+                <div className="input-group" style={{ marginBottom: 0 }}>
+                  <label className="input-label">Expiry (MM/YY)</label>
+                  <input type="text" className="input-field" placeholder="12/26" required maxLength="5"
+                    value={paymentForm.expiry} onChange={e => setPaymentForm({...paymentForm, expiry: e.target.value})} />
+                </div>
+                <div className="input-group" style={{ marginBottom: 0 }}>
+                  <label className="input-label">CVC</label>
+                  <input type="text" className="input-field" placeholder="123" required maxLength="4"
+                    value={paymentForm.cvc} onChange={e => setPaymentForm({...paymentForm, cvc: e.target.value})} />
+                </div>
+              </div>
+              
+              <button type="submit" className="btn btn-primary" disabled={processingPayment} style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '0.5rem', padding: '0.75rem' }}>
+                {processingPayment ? <span className="spinner" style={{width: 16, height: 16}} /> : <Lock size={16} />}
+                Pay {CURRENCIES[currency]?.symbol}{formatPrice(selectedPlanDetails.amount, currency)}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
