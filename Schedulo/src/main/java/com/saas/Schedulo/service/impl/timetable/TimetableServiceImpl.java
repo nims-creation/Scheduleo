@@ -15,6 +15,7 @@ import com.saas.Schedulo.repository.organization.DepartmentRepository;
 import com.saas.Schedulo.repository.organization.OrganizationRepository;
 import com.saas.Schedulo.repository.timetable.TimeSlotRepository;
 import com.saas.Schedulo.repository.timetable.TimetableRepository;
+import com.saas.Schedulo.service.email.EmailService;
 import com.saas.Schedulo.service.timetable.TimetableService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class TimetableServiceImpl implements TimetableService {
     private final OrganizationRepository organizationRepository;
     private final DepartmentRepository departmentRepository;
     private final TimetableMapper timetableMapper;
+    private final EmailService emailService;
 
     @Override
     public TimetableResponse create(CreateTimetableRequest request, UUID organizationId) {
@@ -167,6 +169,7 @@ public class TimetableServiceImpl implements TimetableService {
         timetable = timetableRepository.save(timetable);
 
         log.info("Timetable published: {}", id);
+        emailService.sendTimetablePublishedEmail(timetable);
         return timetableMapper.toResponse(timetable);
     }
 

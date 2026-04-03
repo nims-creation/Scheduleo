@@ -42,6 +42,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- MAIL -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- OAUTH2 CLIENT -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
