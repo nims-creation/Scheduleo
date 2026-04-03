@@ -3,7 +3,7 @@ import api from '../../services/api';
 import {
   Calendar, Clock, Plus, Zap, CheckCircle, Archive, Trash2, X,
   AlertTriangle, BookOpen, Users, MapPin, ChevronRight, ChevronLeft,
-  RefreshCw, Eye, Copy, GripVertical, Info
+  RefreshCw, Eye, Copy, GripVertical, Info, Download, FileText
 } from 'lucide-react';
 
 /* ─── Constants ─────────────────────────────────────────── */
@@ -556,6 +556,28 @@ const Timetables = () => {
   };
   const onWizardSuccess = (tt) => { setShowWizard(false); fetchTimetables(); handleSelect(tt); };
 
+  const handleExportPDF = () => {
+    window.print();
+  };
+
+  const handleExportCSV = () => {
+    if (!entries || entries.length === 0) {
+      showToast('No entries to export', 'error');
+      return;
+    }
+    const headers = ['Day', 'Start Time', 'End Time', 'Subject', 'Teacher', 'Room'];
+    const rows = entries.map(e => [
+      e.dayOfWeek, e.startTime, e.endTime, e.subjectName, e.teacherName, e.roomName
+    ].map(val => `"${val || ''}"`).join(','));
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join("\\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `timetable_${selected?.name || 'export'}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   const toggleDay = (d) => setActiveDays(prev => prev.includes(d) ? prev.filter(x=>x!==d) : [...prev,d]);
 
   return (
@@ -632,7 +654,13 @@ const Timetables = () => {
                   {' · '}{selected.timetableType||'WEEKLY'}
                 </p>
               </div>
-              <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap' }}>
+              <div className="no-print" style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap' }}>
+                <button className="glass-button btn-sm" onClick={handleExportPDF} style={{ fontSize:'0.78rem', background: 'rgba(79, 142, 247, 0.1)', color: 'var(--brand-primary)' }}>
+                  <FileText size={13}/> PDF
+                </button>
+                <button className="glass-button btn-sm" onClick={handleExportCSV} style={{ fontSize:'0.78rem', background: 'rgba(16, 217, 160, 0.1)', color: 'var(--brand-success)' }}>
+                  <Download size={13}/> CSV
+                </button>
                 <button className="glass-button btn-sm" onClick={handleRegenerate} style={{ fontSize:'0.78rem' }}>
                   <RefreshCw size={13}/> Refresh
                 </button>
