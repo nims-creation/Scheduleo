@@ -12,6 +12,7 @@ import CalendarPage from './dashboard/Calendar';
 import Resources from './dashboard/Resources';
 import Billing from './dashboard/Billing';
 import ProfileSettings from './dashboard/ProfileSettings';
+import ChatBot from '../components/ChatBot';
 import ActivityLog from './dashboard/ActivityLog';
 import Reports from './dashboard/Reports';
 import Guide from './dashboard/Guide';
@@ -235,6 +236,9 @@ const Dashboard = () => {
             <Route path="guide" element={<Guide />} />
           </Routes>
         </div>
+        
+        {/* Global Floating AI Assistant */}
+        <ChatBot />
       </main>
     </div>
   );
