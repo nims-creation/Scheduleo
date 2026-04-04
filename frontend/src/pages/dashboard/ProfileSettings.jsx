@@ -40,7 +40,7 @@ const ProfileSettings = () => {
     setMessage({ type: '', text: '' });
     
     try {
-      const response = await api.put(`/users/${user.id}`, {
+      const response = await api.put(`/api/v1/users/${user.id}`, {
         ...formData,
         roles: user.roles // preserve existing roles
       });

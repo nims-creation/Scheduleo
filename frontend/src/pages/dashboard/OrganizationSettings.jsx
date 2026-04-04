@@ -31,7 +31,7 @@ const OrganizationSettings = () => {
   const fetchOrganization = async () => {
     try {
       setIsLoading(true);
-      const { data } = await api.get('/organizations/me');
+      const { data } = await api.get('/api/v1/organizations/me');
       if (data.success) {
         setFormData({
             ...data.data,
@@ -66,7 +66,7 @@ const OrganizationSettings = () => {
     setMessage({ type: '', text: '' });
     
     try {
-      const { data } = await api.put('/organizations/me', formData);
+      const { data } = await api.put('/api/v1/organizations/me', formData);
       if (data.success) {
         setMessage({ type: 'success', text: 'Organization details updated successfully!' });
       } else {

@@ -244,12 +244,12 @@ public class GlobalExceptionHandler {
 
         ApiResponse.ErrorDetails errorDetails = ApiResponse.ErrorDetails.builder()
                 .code("SYS_001")
-                .description("An unexpected error occurred. Please try again later.")
+                .description(ex.getClass().getSimpleName() + ": " + ex.getMessage())
                 .build();
 
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .success(false)
-                .message("Internal server error")
+                .message("Internal server error: " + ex.getMessage())
                 .error(errorDetails)
                 .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())

@@ -88,10 +88,10 @@ const Signup = () => {
           
           <div style={{ display: 'flex', gap: '1rem' }}>
             <div className="input-group" style={{ flex: 2 }}>
-              <label className="input-label">Organization Name (Optional)</label>
+              <label className="input-label">Organization Name</label>
               <div style={{ position: 'relative' }}>
                 <Building style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} size={18} />
-                <input type="text" name="organizationName" className="input-field" style={{ paddingLeft: '2.5rem' }} placeholder="Your Company Ltd" value={formData.organizationName} onChange={handleChange} />
+                <input type="text" name="organizationName" required className="input-field" style={{ paddingLeft: '2.5rem' }} placeholder="Your Company Ltd" value={formData.organizationName} onChange={handleChange} />
               </div>
             </div>
             

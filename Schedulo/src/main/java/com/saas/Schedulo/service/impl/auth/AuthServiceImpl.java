@@ -260,9 +260,17 @@ public class AuthServiceImpl implements AuthService {
             } catch (IllegalArgumentException ignored) {}
         }
 
+        String baseSlug = slugGenerator.generateSlug(request.getOrganizationName());
+        String finalSlug = baseSlug;
+        int counter = 1;
+        while (organizationRepository.existsBySlug(finalSlug)) {
+            finalSlug = baseSlug + "-" + counter;
+            counter++;
+        }
+
         Organization organization = Organization.builder()
                 .name(request.getOrganizationName())
-                .slug(slugGenerator.generateSlug(request.getOrganizationName()))
+                .slug(finalSlug)
                 .organizationType(orgType)
                 .owner(owner)
                 .timezone(request.getTimezone() != null ? request.getTimezone() : "UTC")

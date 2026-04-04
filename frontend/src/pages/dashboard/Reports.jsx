@@ -56,10 +56,10 @@ const Reports = () => {
     setLoading(true);
     try {
       const [usersRes, deptsRes, timetablesRes, resourcesRes] = await Promise.allSettled([
-        api.get('/users?size=1'),
-        api.get('/departments'),
-        api.get('/timetables?size=1'),
-        api.get('/resources'),
+        api.get('/api/v1/users?size=1'),
+        api.get('/api/v1/departments'),
+        api.get('/api/v1/timetables?size=1'),
+        api.get('/api/v1/resources'),
       ]);
 
       setStats({

@@ -32,7 +32,7 @@ const ActivityLog = () => {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/audit-logs?page=${page}&size=20`);
+      const { data } = await api.get(`/api/v1/audit-logs?page=${page}&size=20`);
       setLogs(data.data?.content || []);
       setTotalPages(data.data?.totalPages || 0);
       setTotalElements(data.data?.totalElements || 0);

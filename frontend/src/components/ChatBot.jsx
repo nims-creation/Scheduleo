@@ -27,19 +27,23 @@ const ChatBot = () => {
 
     // NLP Engine (Simulated)
     setTimeout(() => {
-      let botResponse = "I'm sorry, I didn't quite catch that. Try asking about 'teachers', 'conflict', or 'export'.";
+      let botResponse = "I'm sorry, I didn't quite catch that. Try asking about 'teachers', 'conflict', 'timetable', or 'export'.";
       const q = userMsg.toLowerCase();
       
-      if (q.includes('teacher') || q.includes('who')) {
-        botResponse = "We have 12 active teachers in the system right now. Your busiest teacher is 'Dr. Smith' with 15 periods this week.";
-      } else if (q.includes('room') || q.includes('where')) {
+      if (q.includes('teacher') || q.includes('who') || q.includes('staff') || q.includes('doctor')) {
+        botResponse = "We have 12 active staff members in the system right now. Your busiest is 'Dr. Smith' with 15 periods this week.";
+      } else if (q.includes('room') || q.includes('where') || q.includes('ward')) {
         botResponse = "Room A-101 has the highest utilization at 90%. All science labs are booked for Friday.";
       } else if (q.includes('export') || q.includes('pdf') || q.includes('excel') || q.includes('csv') || q.includes('download')) {
         botResponse = "To export, go to the Timetables page, click on any generated timetable, and you'll see the 'PDF' and 'CSV' buttons at the top!";
-      } else if (q.includes('conflict') || q.includes('double book') || q.includes('ai')) {
-        botResponse = "Schedulo guarantees zero conflicts! Our AI engine uses a backtracking algorithm to ensure no teacher or room is double-booked anywhere.";
+      } else if (q.includes('conflict') || q.includes('double book') || q.includes('ai') || q.includes('generation')) {
+        botResponse = "Schedulo guarantees zero conflicts! Our AI engine uses a backtracking algorithm to ensure no resource is double-booked anywhere.";
       } else if (q.includes('hello') || q.includes('hi')) {
         botResponse = "Hello! How can I help you schedule today?";
+      } else if (q.includes('log') || q.includes('active') || q.includes('activity')) {
+        botResponse = "To see the Activity Log, click on 'Activity Log' under Insights on the left sidebar. It tracks all updates and generation events!";
+      } else if (q.includes('timetable') || q.includes('schedule')) {
+        botResponse = "You can manage timetables by clicking 'Timetables' on the left. Click 'New Timetable' to let the AI auto-generate a schedule for you!";
       }
 
       setMessages(prev => [...prev, { id: Date.now() + 1, text: botResponse, sender: 'bot' }]);

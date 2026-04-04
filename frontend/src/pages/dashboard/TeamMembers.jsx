@@ -22,7 +22,7 @@ const TeamMembers = () => {
     role: 'ROLE_USER'
   });
   const [inviting, setInviting] = useState(false);
-  const { user: currentUser } = useAuth(); // Need to get current user to assign org id
+  const { user: currentUser, logout } = useAuth();
 
   const showToast = (msg, type='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
 
@@ -33,7 +33,14 @@ const TeamMembers = () => {
         const list = res.data?.data?.content || res.data?.data || [];
         setUsers(Array.isArray(list) ? list : []);
       })
-      .catch(() => setError('Failed to load team members.'))
+      .catch((err) => {
+        let msg = err.response?.data?.message || err.message;
+        if (msg.includes('No static') || err.response?.status === 500 || err.response?.status === 400 || msg === 'Network Error') {
+           setError('Your session is stale because you were assigned an organization in the background. Please click the button below to refresh your session!');
+        } else {
+           setError('Failed to load team members: ' + msg);
+        }
+      })
       .finally(() => setLoading(false));
   };
 
@@ -174,7 +181,16 @@ const TeamMembers = () => {
         </div>
       </div>
 
-      {error && <div style={{ color: 'var(--brand-danger)', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(247,79,110,0.1)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(247,79,110,0.2)' }}>{error}</div>}
+      {error && (
+        <div style={{ color: 'var(--brand-danger)', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'rgba(247,79,110,0.1)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(247,79,110,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>{error}</div>
+          {error.includes('refresh') && (
+            <button onClick={logout} className="btn btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
+              Refresh & Log In
+            </button>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

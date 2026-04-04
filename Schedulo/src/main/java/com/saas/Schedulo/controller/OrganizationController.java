@@ -25,9 +25,13 @@ public class OrganizationController {
 
     @GetMapping("/me")
     @Operation(summary = "Get current organization", description = "Retrieve details of the organization the user belongs to")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
     public ResponseEntity<ApiResponse<OrganizationResponse>> getCurrentOrganization(
             @CurrentUser CustomUserDetails currentUser) {
+        if (currentUser.getOrganizationId() == null) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("You are not part of any organization.", null));
+        }
         OrganizationResponse response = organizationService.getOrganizationById(currentUser.getOrganizationId());
         return ResponseEntity.ok(ApiResponse.success(response, "Organization retrieved successfully"));
     }

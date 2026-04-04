@@ -42,7 +42,7 @@ const Dashboard = () => {
 
   const fetchNotifications = async () => {
     try {
-      const { data } = await api.get('/notifications');
+      const { data } = await api.get('/api/v1/notifications');
       setNotifications(data.data || []);
       setUnreadCount(data.data?.filter(n => !n.isRead).length || 0);
     } catch (err) {
@@ -61,7 +61,7 @@ const Dashboard = () => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await api.put('/notifications/read-all');
+      await api.put('/api/v1/notifications/read-all');
       fetchNotifications();
     } catch (err) {
       console.error(err);
@@ -108,9 +108,9 @@ const Dashboard = () => {
           <NavItem to="/dashboard/timetables" icon={Clock} label="Timetables" />
 
           <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.1em', padding: '1rem 0.5rem 0.25rem' }}>Organization</div>
-          <NavItem to="/dashboard/team" icon={Users} label="Team Members" />
-          <NavItem to="/dashboard/departments" icon={Layers} label="Departments" />
-          <NavItem to="/dashboard/resources" icon={Server} label="Resources" />
+          <NavItem to="/dashboard/team" icon={Users} label={user?.organization?.type === 'HOSPITAL' ? 'Doctors & Staff' : 'Team Members'} />
+          <NavItem to="/dashboard/departments" icon={Layers} label={user?.organization?.type === 'HOSPITAL' ? 'Wards' : 'Departments'} />
+          <NavItem to="/dashboard/resources" icon={Server} label={user?.organization?.type === 'HOSPITAL' ? 'Equipment & Beds' : 'Resources'} />
           <NavItem to="/dashboard/billing" icon={CreditCard} label="Billing" />
           <NavItem to="/dashboard/settings" icon={Zap} label="Settings" />
 

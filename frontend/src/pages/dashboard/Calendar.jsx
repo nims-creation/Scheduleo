@@ -44,8 +44,8 @@ const Calendar = () => {
       const { start, end, startOnlyDate, endOnlyDate } = getMonthStartAndEnd(currentDate);
 
       const [eventsRes, holidaysRes] = await Promise.all([
-        api.get('/calendar/events', { params: { start, end } }),
-        api.get('/calendar/holidays', { params: { start: startOnlyDate, end: endOnlyDate } })
+        api.get('/api/v1/calendar/events', { params: { start, end } }),
+        api.get('/api/v1/calendar/holidays', { params: { start: startOnlyDate, end: endOnlyDate } })
       ]);
 
       setEvents(eventsRes.data.data || []);
@@ -108,7 +108,7 @@ const Calendar = () => {
          endDatetime = `${eventForm.startDate}T${eventForm.endTime || '23:59'}:00`;
       }
 
-      await api.post('/calendar/events', {
+      await api.post('/api/v1/calendar/events', {
         title: eventForm.title,
         description: eventForm.description,
         startDatetime,
@@ -121,14 +121,21 @@ const Calendar = () => {
       setEventForm({ title: '', description: '', startDate: '', startTime: '', endDate: '', endTime: '', eventType: 'MEETING', location: '', virtualMeetingUrl: ''});
       fetchData();
     } catch (err) {
-      alert('Error creating event: ' + (err.response?.data?.message || err.message));
+      let errorText = err.response?.data?.message || err.message;
+      if (err.response?.data?.error?.details) {
+        const details = err.response.data.error.details;
+        if (typeof details === 'object' && Object.keys(details).length > 0) {
+          errorText = Object.values(details)[0];
+        }
+      }
+      setError('Error creating event: ' + errorText);
     }
   };
 
   const handleCreateHoliday = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/calendar/holidays', {
+      await api.post('/api/v1/calendar/holidays', {
         name: holidayForm.name,
         description: holidayForm.description,
         holidayDate: holidayForm.holidayDate,
@@ -136,14 +143,22 @@ const Calendar = () => {
         isHalfDay: holidayForm.isHalfDay
       });
       setShowHolidayModal(false);
-      setHolidayForm({ name: '', description: '', holidayDate: '', holidayType: 'PUBLIC', isHalfDay: false });
+      setHolidayForm({ name: '', description: '', holidayDate: '', holidayType: 'PUBLIC_HOLIDAY', isHalfDay: false });
       fetchData();
     } catch (err) {
-      alert('Error creating holiday: ' + (err.response?.data?.message || err.message));
+      let errorText = err.response?.data?.message || err.message;
+      if (err.response?.data?.error?.details) {
+        const details = err.response.data.error.details;
+        if (typeof details === 'object' && Object.keys(details).length > 0) {
+          errorText = Object.values(details)[0];
+        }
+      }
+      setError('Error creating holiday: ' + errorText);
     }
   };
 
   const openDateModal = (dateObj) => {
+    setError(null);
     const dStr = new Date(dateObj.date.getTime() - dateObj.date.getTimezoneOffset() * 60000).toISOString().split('T')[0];
     setSelectedDate(dStr);
     setEventForm({ ...eventForm, startDate: dStr, endDate: dStr });
@@ -162,10 +177,10 @@ const Calendar = () => {
           <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.875rem' }}>Manage events, meetings, and holidays.</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <button className="btn btn-outline" onClick={() => setShowHolidayModal(true)}>
+          <button className="btn btn-outline" onClick={() => { setError(null); setShowHolidayModal(true); }}>
             <Plus size={16} /> Add Holiday
           </button>
-          <button className="btn btn-primary" onClick={() => setShowEventModal(true)}>
+          <button className="btn btn-primary" onClick={() => { setError(null); setShowEventModal(true); }}>
             <Plus size={16} /> Add Event
           </button>
         </div>
@@ -275,6 +290,12 @@ const Calendar = () => {
               >×</button>
             </div>
 
+            {error && (
+              <div style={{ background: 'rgba(2ef4444, 0.1)', borderLeft: '4px solid var(--brand-danger)', padding: '0.75rem 1rem', marginBottom: '1rem', borderRadius: '4px', color: 'var(--brand-danger)', fontSize: '0.9rem' }}>
+                {error}
+              </div>
+            )}
+
             <form onSubmit={handleCreateEvent}>
               <div className="input-group">
                 <label className="input-label">Event Title</label>
@@ -351,6 +372,12 @@ const Calendar = () => {
               >×</button>
             </div>
 
+            {error && (
+              <div style={{ background: 'rgba(2ef4444, 0.1)', borderLeft: '4px solid var(--brand-danger)', padding: '0.75rem 1rem', marginBottom: '1rem', borderRadius: '4px', color: 'var(--brand-danger)', fontSize: '0.9rem' }}>
+                {error}
+              </div>
+            )}
+
             <form onSubmit={handleCreateHoliday}>
               <div className="input-group">
                 <label className="input-label">Holiday Name</label>
@@ -383,9 +410,9 @@ const Calendar = () => {
                   onChange={e => setHolidayForm({...holidayForm, holidayType: e.target.value})}
                   style={{ cursor: 'pointer' }}
                 >
-                  <option value="PUBLIC">🌐 Public</option>
-                  <option value="ORGANIZATIONAL">🏢 Organizational</option>
-                  <option value="RELIGIOUS">🕌 Religious</option>
+                  <option value="PUBLIC_HOLIDAY">🌐 Public</option>
+                  <option value="COMPANY_HOLIDAY">🏢 Organizational</option>
+                  <option value="OTHER">🕌 Religious</option>
                   <option value="OPTIONAL">📋 Optional</option>
                 </select>
               </div>

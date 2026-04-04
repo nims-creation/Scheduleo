@@ -7,6 +7,7 @@ const Resources = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingResource, setEditingResource] = useState(null);
+  const [error, setError] = useState(null);
   
   const [formData, setFormData] = useState({
     name: '', type: 'ROOM', capacity: '', isAvailableForBooking: true
@@ -15,7 +16,7 @@ const Resources = () => {
   const fetchResources = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get('/resources');
+      const { data } = await api.get('/api/v1/resources');
       setResources(data.data || []);
     } catch (error) {
       console.error('Failed to fetch resources:', error);
@@ -28,23 +29,36 @@ const Resources = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     try {
+      const payload = { ...formData };
+      if (payload.capacity === '') {
+        payload.capacity = null;
+      }
+      
       if (editingResource) {
-        await api.put(`/resources/${editingResource.id}`, formData);
+        await api.put(`/api/v1/resources/${editingResource.id}`, payload);
       } else {
-        await api.post('/resources', formData);
+        await api.post('/api/v1/resources', payload);
       }
       setShowModal(false);
       fetchResources();
-    } catch (error) {
-      alert('Error saving resource: ' + (error.response?.data?.message || error.message));
+    } catch (err) {
+      let errorText = err.response?.data?.message || err.message;
+      if (err.response?.data?.error?.details) {
+        const details = err.response.data.error.details;
+        if (typeof details === 'object' && Object.keys(details).length > 0) {
+          errorText = Object.values(details)[0];
+        }
+      }
+      setError('Error saving resource: ' + errorText);
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this resource?')) {
       try {
-        await api.delete(`/resources/${id}`);
+        await api.delete(`/api/v1/resources/${id}`);
         fetchResources();
       } catch (error) {
         alert('Failed to delete resource');
@@ -71,6 +85,7 @@ const Resources = () => {
         </div>
         <button className="btn btn-primary" onClick={() => {
           setEditingResource(null);
+          setError(null);
           setFormData({ name: '', type: 'ROOM', capacity: '', isAvailableForBooking: true });
           setShowModal(true);
         }}>
@@ -119,6 +134,7 @@ const Resources = () => {
                   <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
                     <button className="btn btn-outline" style={{ padding: '0.5rem', marginRight: '0.5rem' }} onClick={() => {
                         setEditingResource(res);
+                        setError(null);
                         setFormData({ name: res.name, type: res.type, capacity: res.capacity || '', isAvailableForBooking: res.isAvailableForBooking });
                         setShowModal(true);
                       }}>
@@ -152,6 +168,11 @@ const Resources = () => {
             </div>
 
             <form onSubmit={handleSubmit}>
+              {error && (
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid var(--brand-danger)', padding: '0.75rem 1rem', marginBottom: '1rem', borderRadius: '4px', color: 'var(--brand-danger)', fontSize: '0.9rem' }}>
+                  {error}
+                </div>
+              )}
               <div className="input-group">
                 <label className="input-label">Resource Name</label>
                 <input
