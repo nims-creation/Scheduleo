@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { Activity, User, Clock, Filter, ChevronLeft, ChevronRight, Search, Shield, Edit, Trash2, Plus, Eye, LogIn, LogOut, Download, Upload, Zap } from 'lucide-react';
 
@@ -17,7 +16,6 @@ const actionColors = {
 };
 
 const ActivityLog = () => {
-  const { user } = useAuth();
   const [logs, setLogs] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [page, setPage] = React.useState(0);

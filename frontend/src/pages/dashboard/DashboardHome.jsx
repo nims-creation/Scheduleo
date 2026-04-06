@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
@@ -23,7 +23,7 @@ const DashboardHome = () => {
         const members = usersData?.content || usersData || [];
         const active = timetables.filter(t => t.status === 'PUBLISHED' || t.isActive).length;
         setStats({ timetables: timetables.length, members: Array.isArray(members) ? members.length : 0, activeTimetables: active });
-      } catch (e) { /* silent */ }
+      } catch (_e) { /* silent */ }
       finally { setLoading(false); }
     };
     fetchStats();

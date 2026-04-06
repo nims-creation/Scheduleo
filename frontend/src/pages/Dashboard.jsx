@@ -34,12 +34,6 @@ const Dashboard = () => {
   const [unreadCount, setUnreadCount] = React.useState(0);
   const [showNotifications, setShowNotifications] = React.useState(false);
 
-  React.useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000); // Check every minute
-    return () => clearInterval(interval);
-  }, []);
-
   const fetchNotifications = async () => {
     try {
       const { data } = await api.get('/api/v1/notifications');
@@ -49,6 +43,12 @@ const Dashboard = () => {
       console.error(err);
     }
   };
+
+  React.useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMarkAsRead = async (id) => {
     try {

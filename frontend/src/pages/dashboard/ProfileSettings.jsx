@@ -4,7 +4,7 @@ import { User, Mail, Phone, MapPin, Camera, Save, Lock, Shield } from 'lucide-re
 import api from '../../services/api';
 
 const ProfileSettings = () => {
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('personal');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -40,7 +40,7 @@ const ProfileSettings = () => {
     setMessage({ type: '', text: '' });
     
     try {
-      const response = await api.put(`/api/v1/users/${user.id}`, {
+      await api.put(`/api/v1/users/${user.id}`, {
         ...formData,
         roles: user.roles // preserve existing roles
       });

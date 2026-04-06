@@ -4,19 +4,20 @@ import api from '../services/api';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  // Initialize from local storage
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('accessToken');
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
+  // Lazy initializer avoids calling setState synchronously inside an effect
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('accessToken');
+      return storedUser && token ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
     }
-    setLoading(false);
+  });
+  const [loading, setLoading] = useState(false);
 
-    // Listen for 401s
+  // Listen for 401s
+  useEffect(() => {
     const handleAuthExpired = () => setUser(null);
     window.addEventListener('auth-expired', handleAuthExpired);
     return () => window.removeEventListener('auth-expired', handleAuthExpired);
@@ -118,4 +119,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// Exported separately to satisfy react-refresh/only-export-components
+export function useAuth() {
+  return useContext(AuthContext);
+}

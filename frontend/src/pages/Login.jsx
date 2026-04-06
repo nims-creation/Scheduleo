@@ -29,7 +29,7 @@ const Login = () => {
       setToast({ msg: 'If the email exists, a reset link has been sent.', type: 'success' });
       setShowForgotModal(false);
       setForgotEmail('');
-    } catch (err) {
+    } catch (_err) {
       setToast({ msg: 'Failed to initiate password reset.', type: 'error' });
     } finally {
       setForgotLoading(false);

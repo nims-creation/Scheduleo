@@ -77,7 +77,7 @@ const Reports = () => {
     }
   };
 
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 
   return (
     <div style={{ padding: '2rem' }}>

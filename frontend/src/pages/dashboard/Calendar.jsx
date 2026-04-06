@@ -12,7 +12,6 @@ const Calendar = () => {
   // Modals state
   const [showEventModal, setShowEventModal] = useState(false);
   const [showHolidayModal, setShowHolidayModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
 
   // Form states
   const [eventForm, setEventForm] = useState({

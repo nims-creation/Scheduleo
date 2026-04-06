@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Loader2, Building, Clock, MapPin, Briefcase } from 'lucide-react';
 import api from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
 
 const OrganizationSettings = () => {
-  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     description: '',

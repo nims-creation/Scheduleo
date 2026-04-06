@@ -18,8 +18,8 @@ const Resources = () => {
       setLoading(true);
       const { data } = await api.get('/api/v1/resources');
       setResources(data.data || []);
-    } catch (error) {
-      console.error('Failed to fetch resources:', error);
+    } catch (_error) {
+      // silently ignore
     } finally {
       setLoading(false);
     }

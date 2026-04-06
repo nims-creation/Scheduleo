@@ -496,7 +496,6 @@ const Timetables = () => {
   const [toast, setToast] = useState(null);
   const [teamMembers, setTeamMembers] = useState([]);
   const [resources, setResources] = useState([]);
-  const [activeView, setActiveView] = useState('grid'); // 'grid' | 'list'
   const [activeDays, setActiveDays] = useState(['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY']);
 
   const showToast = (msg, type='success') => {
@@ -529,7 +528,7 @@ const Timetables = () => {
       ]);
       if (memRes.status==='fulfilled') setTeamMembers(memRes.value.data?.data?.content || memRes.value.data?.data || []);
       if (resRes.status==='fulfilled') setResources(resRes.value.data?.data?.content || resRes.value.data?.data || []);
-    } catch {}
+    } catch { /* silently ignore support data errors */ }
   };
 
   useEffect(() => { fetchTimetables(); fetchSupportData(); }, [fetchTimetables]);
