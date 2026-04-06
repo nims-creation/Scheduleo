@@ -46,3 +46,5 @@ jobs:
     - name: Test with Maven
       working-directory: ./Schedulo
       run: mvn test
+      env:
+        DB_SSL_MODE: disable

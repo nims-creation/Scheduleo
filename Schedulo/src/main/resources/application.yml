@@ -28,7 +28,7 @@ spring:
         # Disable server-side prepared statements (required for pgBouncer)
         prepareThreshold: 0
         preparedStatementCacheQueries: 0
-        sslmode: require
+        sslmode: ${DB_SSL_MODE:require}
 
   # ── JPA / Hibernate ───────────────────────────────────────
   jpa:
