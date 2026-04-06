@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDa
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
@@ -17,9 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
         ElasticsearchRestClientAutoConfiguration.class,
         // Exclude OAuth2 auto-config — we configure it manually in SecurityConfig
         // only when real GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET are provided
-        OAuth2ClientAutoConfiguration.class,
-        // Exclude Mail auto-config — we configure it conditionally via environment
-        MailSenderAutoConfiguration.class
+        OAuth2ClientAutoConfiguration.class
 })
 @EnableJpaAuditing(auditorAwareRef = "auditorAwareImpl")
 public class ScheduloApplication {
