@@ -1,5 +1,5 @@
 # application.yml - Production-safe configuration
-# All secrets MUST be provided via environment variables (no hardcoded credentials)
+# Tuned for: Supabase PostgreSQL (port 6543 / pgBouncer) + Upstash Redis (TLS)
 spring:
   application:
     name: Schedulo
@@ -14,9 +14,17 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
+      maximum-pool-size: 5
+      minimum-idle: 1
       connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      # Required for Supabase pgBouncer (port 6543 transaction mode)
+      # Disables server-side prepared statements which pgBouncer doesn't support
+      data-source-properties:
+        prepareThreshold: 0
+        preparedStatementCacheQueries: 0
+        sslmode: require
 
   jpa:
     hibernate:
@@ -24,9 +32,15 @@ spring:
     show-sql: false
     properties:
       hibernate:
+        # Explicit dialect required — prevents "Unable to determine Dialect" error
+        # when Hibernate can't probe JDBC metadata at startup
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         default_schema: public
+        # Disable prepared statement caching for pgBouncer compatibility
+        jdbc:
+          lob:
+            non_contextual_creation: true
     open-in-view: false
 
   flyway:
@@ -36,20 +50,22 @@ spring:
 
   data:
     redis:
-      url: ${REDIS_URL:${SPRING_DATA_REDIS_URL:redis://localhost:6379}}
+      # Supports both SPRING_DATA_REDIS_URL (your Render var) and REDIS_URL
+      url: ${SPRING_DATA_REDIS_URL:${REDIS_URL:redis://localhost:6379}}
       ssl:
+        # Set to true for Upstash (rediss:// URL) — your var is SPRING_DATA_REDIS_SSL_ENABLED=true
         enabled: ${SPRING_DATA_REDIS_SSL_ENABLED:false}
       lettuce:
         pool:
-          max-active: 8
-          max-idle: 8
+          max-active: 4
+          max-idle: 4
           min-idle: 0
-          max-wait: -1ms
+          max-wait: 2000ms
 
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME:}
+    username: ${MAIL_USERNAME:noreply@schedulo.app}
     password: ${MAIL_PASSWORD:}
     properties:
       mail:
@@ -72,6 +88,8 @@ server:
   port: ${PORT:${SERVER_PORT:8080}}
   servlet:
     context-path: /
+  tomcat:
+    connection-timeout: 20000
 
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
@@ -100,6 +118,7 @@ logging:
     root: INFO
     com.saas: INFO
     org.springframework.security: WARN
+    org.hibernate.SQL: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
