@@ -37,22 +37,22 @@ A modern, highly scalable 3-tier architecture designed for enterprise readiness,
 ```mermaid
 architecture-beta
     group client(cloud)[Client Tier]
-    group app(server)[Application Server — Spring Boot]
+    group app(server)[Application Server]
     group db(database)[Data Tier]
     group external(cloud)[External Integrations]
 
-    service frontend(internet)[React / Vite SPA] in client
+    service frontend(internet)[React SPA] in client
 
-    service gateway(server)[API Gateway & JWT Auth] in app
+    service gateway(server)[API Gateway] in app
     service engine(server)[Scheduling Engine] in app
     service core(server)[Multi-Tenant Core] in app
 
-    service pg(database)[PostgreSQL — Supabase] in db
+    service pg(database)[PostgreSQL] in db
     service redis(database)[Redis Cache] in db
 
     service google(internet)[Google OAuth2] in external
     service stripe(internet)[Stripe Payments] in external
-    service openai(internet)[OpenAI / ChatBot] in external
+    service openai(internet)[OpenAI ChatBot] in external
 
     frontend:R --> L:gateway
     gateway:B --> T:engine
