@@ -35,34 +35,37 @@ Built with:
 A modern, highly scalable 3-tier architecture designed for enterprise readiness, secure multi-tenancy, and high performance.
 
 ```mermaid
-architecture-beta
-    group client(cloud)[Client Tier]
-    group app(server)[Application Server]
-    group db(database)[Data Tier]
-    group external(cloud)[External Integrations]
+flowchart TD
+    subgraph Client ["Client Tier"]
+        frontend("React / Vite SPA")
+    end
 
-    service frontend(internet)[React SPA] in client
+    subgraph External ["External Integrations"]
+        google("Google OAuth2")
+        stripe("Stripe Payments")
+        openai("OpenAI ChatBot")
+    end
 
-    service gateway(server)[API Gateway] in app
-    service engine(server)[Scheduling Engine] in app
-    service core(server)[Multi-Tenant Core] in app
+    subgraph App ["Application Server (Spring Boot)"]
+        gateway("API Gateway & JWT Auth")
+        engine("Scheduling Engine")
+        core("Multi-Tenant Core")
+    end
 
-    service pg(database)[PostgreSQL] in db
-    service redis(database)[Redis Cache] in db
+    subgraph DB ["Data Tier"]
+        pg[("PostgreSQL (Supabase)")]
+        redis[("Redis Cache")]
+    end
 
-    service google(internet)[Google OAuth2] in external
-    service stripe(internet)[Stripe Payments] in external
-    service openai(internet)[OpenAI ChatBot] in external
-
-    frontend:R --> L:gateway
-    gateway:B --> T:engine
-    gateway:B --> T:core
-    core:R --> L:pg
-    engine:R --> L:pg
-    gateway:R --> L:redis
-    gateway:T --> B:google
-    gateway:T --> B:stripe
-    gateway:T --> B:openai
+    frontend -->|REST / HTTPS| gateway
+    gateway --> engine
+    gateway --> core
+    core --> pg
+    engine --> pg
+    gateway --> redis
+    gateway -.->|OAuth| google
+    gateway -.->|API| stripe
+    gateway -.->|API| openai
 ```
 
 ### Layer Breakdown
