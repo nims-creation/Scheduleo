@@ -1,31 +1,40 @@
-# Stage 1: Build the application securely using the Maven Wrapper
+# ── Stage 1: Build ────────────────────────────────────────────
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 
-# Copy maven executable to the image
+# Copy Maven wrapper files first (cache layer — only rebuilt if pom.xml changes)
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
-
-# Fix execution permissions for Maven wrapper
 RUN chmod +x ./mvnw
 
-# Resolve dependencies (better Docker cache utilization)
-RUN ./mvnw dependency:go-offline
+# Download dependencies (separate layer for Docker cache efficiency)
+RUN ./mvnw dependency:go-offline -B
 
-# Copy the actual source code and package
+# Copy source and build (skip tests — tests need DB connection)
 COPY src src
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests -B
 
-# Stage 2: Create a minimal production image
+# ── Stage 2: Production image ─────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Copy the built jar from the build stage
+# Create non-root user for security
+RUN addgroup -S spring && adduser -S spring -G spring
+
+# Copy built JAR
 COPY --from=build /app/target/Schedulo-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose the server port
+# Set ownership
+RUN chown spring:spring app.jar
+USER spring
+
+# Render uses PORT env var — pass it through to JVM
 EXPOSE 8080
 
-# Execute the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# JVM tuning for container memory limits (important on Render free tier)
+ENTRYPOINT ["java", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]

@@ -1,5 +1,7 @@
-# application.yml - Production-safe configuration
-# Tuned for: Supabase PostgreSQL (port 6543 / pgBouncer) + Upstash Redis (TLS)
+# ============================================================
+# application.yml — Production-ready for Render deployment
+# Works with: Supabase PostgreSQL + Upstash Redis
+# ============================================================
 spring:
   application:
     name: Schedulo
@@ -8,66 +10,66 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
+  # ── Database (Supabase PostgreSQL via pgBouncer) ──────────
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/timetable_db}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 5
+      maximum-pool-size: 3
       minimum-idle: 1
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      # -1 = wait indefinitely; 0 = skip validation at startup (don't fail-fast)
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      # Skip pool validation at startup — app boots even if DB is momentarily slow
       initialization-fail-timeout: 0
-      # Required for Supabase pgBouncer (port 6543 transaction mode)
       data-source-properties:
+        # Disable server-side prepared statements (required for pgBouncer)
         prepareThreshold: 0
         preparedStatementCacheQueries: 0
         sslmode: require
 
+  # ── JPA / Hibernate ───────────────────────────────────────
   jpa:
     hibernate:
-      # 'none' = don't run DDL at startup (safest for production with external DB)
-      # Tables were created on first deploy; use 'update' locally if needed
+      # NEVER use 'update/create' in production — tables already exist in Supabase
       ddl-auto: none
     show-sql: false
     properties:
       hibernate:
+        # Must be explicit — prevents startup crash when JDBC metadata is unavailable
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+        format_sql: false
         default_schema: public
         jdbc:
           lob:
             non_contextual_creation: true
     open-in-view: false
-    # Defer datasource init so app context loads before DB connection is probed
     defer-datasource-initialization: true
 
+  # ── Flyway (disabled — Supabase manages schema) ───────────
   flyway:
     enabled: false
-    locations: classpath:db/migration
-    baseline-on-migrate: true
 
+  # ── Redis (Upstash via TLS) ───────────────────────────────
   data:
     redis:
-      # Supports both SPRING_DATA_REDIS_URL (your Render var) and REDIS_URL
-      url: ${SPRING_DATA_REDIS_URL:${REDIS_URL:redis://localhost:6379}}
+      url: ${SPRING_DATA_REDIS_URL:redis://localhost:6379}
       ssl:
-        # Set to true for Upstash (rediss:// URL) — your var is SPRING_DATA_REDIS_SSL_ENABLED=true
         enabled: ${SPRING_DATA_REDIS_SSL_ENABLED:false}
       lettuce:
         pool:
-          max-active: 4
-          max-idle: 4
+          max-active: 3
+          max-idle: 3
           min-idle: 0
           max-wait: 2000ms
 
+  # ── Mail (Gmail SMTP) ─────────────────────────────────────
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME:noreply@schedulo.app}
+    username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     properties:
       mail:
@@ -76,6 +78,7 @@ spring:
           starttls:
             enable: true
 
+  # ── OAuth2 (conditionally enabled in SecurityConfig) ──────
   security:
     oauth2:
       client:
@@ -85,29 +88,32 @@ spring:
             client-secret: ${GOOGLE_CLIENT_SECRET:disabled}
             scope: email, profile
 
-
+# ── Server ────────────────────────────────────────────────
 server:
-  port: ${PORT:${SERVER_PORT:8080}}
+  port: ${PORT:8080}
   servlet:
     context-path: /
   tomcat:
     connection-timeout: 20000
 
+# ── App Config ────────────────────────────────────────────
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
   jwt:
-    secret: ${APP_JWT_SECRET:${JWT_SECRET:changeme-use-env-var-in-production}}
+    secret: ${APP_JWT_SECRET:changeme-replace-in-production-with-32-char-secret}
     access-token-expiration-ms: 900000
     refresh-token-expiration-ms: 604800000
 
+# ── Third Party ───────────────────────────────────────────
 supabase:
-  url: ${SUPABASE_URL:http://localhost}
-  key: ${SUPABASE_KEY:placeholder}
+  url: ${SUPABASE_URL:}
+  key: ${SUPABASE_KEY:}
 
 stripe:
   api-key: ${STRIPE_API_KEY:sk_test_placeholder}
   webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
 
+# ── API Docs ─────────────────────────────────────────────
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -115,20 +121,22 @@ springdoc:
     path: /swagger-ui.html
     operationsSorter: method
 
+# ── Logging ──────────────────────────────────────────────
 logging:
   level:
-    root: INFO
-    com.saas: INFO
+    root: WARN
+    com.saas.Schedulo: INFO
     org.springframework.security: WARN
-    org.hibernate.SQL: WARN
+    org.hibernate: WARN
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%logger{36}] - %msg%n"
 
+# ── Actuator ─────────────────────────────────────────────
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
+        include: health,info
   endpoint:
     health:
-      show-details: when_authorized
+      show-details: never
