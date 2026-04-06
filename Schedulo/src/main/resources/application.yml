@@ -19,8 +19,9 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
+      # -1 = wait indefinitely; 0 = skip validation at startup (don't fail-fast)
+      initialization-fail-timeout: 0
       # Required for Supabase pgBouncer (port 6543 transaction mode)
-      # Disables server-side prepared statements which pgBouncer doesn't support
       data-source-properties:
         prepareThreshold: 0
         preparedStatementCacheQueries: 0
@@ -28,20 +29,21 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      # 'none' = don't run DDL at startup (safest for production with external DB)
+      # Tables were created on first deploy; use 'update' locally if needed
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
-        # Explicit dialect required — prevents "Unable to determine Dialect" error
-        # when Hibernate can't probe JDBC metadata at startup
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         default_schema: public
-        # Disable prepared statement caching for pgBouncer compatibility
         jdbc:
           lob:
             non_contextual_creation: true
     open-in-view: false
+    # Defer datasource init so app context loads before DB connection is probed
+    defer-datasource-initialization: true
 
   flyway:
     enabled: false
