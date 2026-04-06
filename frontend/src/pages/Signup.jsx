@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../services/api';
 import { Calendar, Mail, Lock, User, Loader2, Building } from 'lucide-react';
 
 const Signup = () => {
@@ -140,7 +141,7 @@ const Signup = () => {
 
         <button 
           type="button" 
-          onClick={() => window.location.href = 'http://localhost:8080/oauth2/authorization/google'}
+          onClick={() => window.location.href = `${API_URL}/oauth2/authorization/google`}
           className="btn btn-secondary" 
           style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: '#ffffff', color: '#1a1a1a' }}
         >
