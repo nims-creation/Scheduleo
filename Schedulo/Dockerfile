@@ -13,7 +13,7 @@ RUN ./mvnw dependency:go-offline -B
 
 # Copy source and build (skip tests — tests need DB connection)
 COPY src src
-RUN ./mvnw clean package -DskipTests -B
+RUN ./mvnw clean package -Dmaven.test.skip=true -B
 
 # ── Stage 2: Production image ─────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine
