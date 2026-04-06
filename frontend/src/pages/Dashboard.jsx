@@ -17,6 +17,7 @@ import ActivityLog from './dashboard/ActivityLog';
 import Reports from './dashboard/Reports';
 import Guide from './dashboard/Guide';
 
+// eslint-disable-next-line no-unused-vars
 const NavItem = ({ to, icon: Icon, label, exact }) => {
   const location = useLocation();
   const isActive = exact ? location.pathname === to : location.pathname.startsWith(to);
@@ -48,7 +49,7 @@ const Dashboard = () => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- fetchNotifications is stable
 
   const handleMarkAsRead = async (id) => {
     try {

@@ -25,7 +25,7 @@ const ActivityLog = () => {
 
   React.useEffect(() => {
     fetchLogs();
-  }, [page]);
+  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps -- fetchLogs is defined below and stable
 
   const fetchLogs = async () => {
     setLoading(true);

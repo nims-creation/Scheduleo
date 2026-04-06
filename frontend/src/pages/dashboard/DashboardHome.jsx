@@ -23,7 +23,7 @@ const DashboardHome = () => {
         const members = usersData?.content || usersData || [];
         const active = timetables.filter(t => t.status === 'PUBLISHED' || t.isActive).length;
         setStats({ timetables: timetables.length, members: Array.isArray(members) ? members.length : 0, activeTimetables: active });
-      } catch (_e) { /* silent */ }
+      } catch { /* silent */ }
       finally { setLoading(false); }
     };
     fetchStats();

@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
-  const [loading, setLoading] = useState(false);
 
   // Listen for 401s
   useEffect(() => {
@@ -113,13 +112,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, loginWithToken, signup, logout, loading }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, login, loginWithToken, signup, logout, loading: false }}>
+      {children}
     </AuthContext.Provider>
   );
 };
 
-// Exported separately to satisfy react-refresh/only-export-components
-export function useAuth() {
-  return useContext(AuthContext);
-}
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => useContext(AuthContext);

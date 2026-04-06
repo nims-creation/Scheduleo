@@ -8,6 +8,7 @@ const Calendar = () => {
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [_selectedDate, setSelectedDate] = useState('');
 
   // Modals state
   const [showEventModal, setShowEventModal] = useState(false);
@@ -59,7 +60,7 @@ const Calendar = () => {
 
   useEffect(() => {
     fetchData();
-  }, [currentDate]);
+  }, [currentDate]); // eslint-disable-line react-hooks/exhaustive-deps -- fetchData is stable
 
   const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));

@@ -18,7 +18,7 @@ const Resources = () => {
       setLoading(true);
       const { data } = await api.get('/api/v1/resources');
       setResources(data.data || []);
-    } catch (_error) {
+    } catch {
       // silently ignore
     } finally {
       setLoading(false);
@@ -60,7 +60,7 @@ const Resources = () => {
       try {
         await api.delete(`/api/v1/resources/${id}`);
         fetchResources();
-      } catch (error) {
+      } catch {
         alert('Failed to delete resource');
       }
     }

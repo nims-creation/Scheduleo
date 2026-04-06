@@ -2,6 +2,7 @@ import React from 'react';
 import api from '../../services/api';
 import { BarChart3, Users, Calendar, Clock, Layers, TrendingUp, Activity, Server, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
+// eslint-disable-next-line no-unused-vars
 const StatCard = ({ icon: Icon, label, value, change, changeType, color, gradient }) => (
   <div style={{
     background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',

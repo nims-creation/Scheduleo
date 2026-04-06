@@ -60,7 +60,7 @@ const Billing = () => {
         : defaultPlans;
       setPlans(latestPlans);
       setCurrentSubscription(subRes.data?.data);
-    } catch (_err) {
+    } catch {
       console.error('Failed to load billing data');
     } finally {
       setLoading(false);
@@ -92,7 +92,7 @@ const Billing = () => {
       await api.post('/api/v1/subscriptions/upgrade', { planCode, billingCycle });
       alert('Subscription changed successfully!');
       fetchBillingData();
-    } catch (_err) {
+    } catch {
       alert('Error updating subscription.');
     }
   };
