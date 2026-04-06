@@ -48,3 +48,4 @@ jobs:
       run: mvn test
       env:
         DB_SSL_MODE: disable
+        SPRING_JPA_HIBERNATE_DDL_AUTO: update
