@@ -7,5 +7,15 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    // Split large vendor libraries into separate cacheable chunks
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-charts': ['recharts'],
+          'vendor-icons': ['lucide-react'],
+        },
+      },
+    },
   },
 })

@@ -57,8 +57,7 @@ public class TimetableServiceImpl implements TimetableService {
             timetable.setDepartment(department);
         }
 
-        timetable = timetableRepository.save(timetable);
-
+        // Build time slots before saving — one flush handles everything
         if (request.getTimeSlots() != null && !request.getTimeSlots().isEmpty()) {
             for (int i = 0; i < request.getTimeSlots().size(); i++) {
                 TimeSlotRequest slotRequest = request.getTimeSlots().get(i);
@@ -77,9 +76,9 @@ public class TimetableServiceImpl implements TimetableService {
                         .build();
                 timetable.getTimeSlots().add(timeSlot);
             }
-            timetable = timetableRepository.save(timetable);
         }
 
+        timetable = timetableRepository.save(timetable);
         log.info("Timetable created with ID: {}", timetable.getId());
         return timetableMapper.toResponse(timetable);
     }
@@ -233,25 +232,25 @@ public class TimetableServiceImpl implements TimetableService {
             throw new ResourceConflictException("Specified timetable is not a template");
         }
 
-        // Create new timetable based on template
-        request = CreateTimetableRequest.builder()
+        // Build new timetable entity directly from template — no DB round-trip needed
+        Timetable newTimetable = Timetable.builder()
                 .name(request.getName())
-                .description(request.getDescription() != null ?
-                        request.getDescription() : template.getDescription())
+                .description(request.getDescription() != null ? request.getDescription() : template.getDescription())
+                .organization(template.getOrganization())
+                .timetableType(request.getTimetableType() != null ? request.getTimetableType() : template.getTimetableType())
                 .effectiveFrom(request.getEffectiveFrom())
                 .effectiveTo(request.getEffectiveTo())
-                .timetableType(request.getTimetableType() != null ?
-                        request.getTimetableType() : template.getTimetableType())
-                .departmentId(request.getDepartmentId())
+                .status(Timetable.TimetableStatus.DRAFT)
                 .isTemplate(false)
                 .build();
 
-        TimetableResponse response = create(request, template.getOrganization().getId());
+        if (request.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(request.getDepartmentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Department", "id", request.getDepartmentId()));
+            newTimetable.setDepartment(department);
+        }
 
-        // Copy time slots from template
-        Timetable newTimetable = timetableRepository.findById(UUID.fromString(response.getId().toString()))
-                .orElseThrow();
-
+        // Copy time slots from template before saving — single flush
         for (TimeSlot slot : template.getTimeSlots()) {
             TimeSlot newSlot = TimeSlot.builder()
                     .timetable(newTimetable)
@@ -268,6 +267,7 @@ public class TimetableServiceImpl implements TimetableService {
         }
 
         newTimetable = timetableRepository.save(newTimetable);
+        log.info("Timetable created from template {}: {}", templateId, newTimetable.getId());
         return timetableMapper.toResponse(newTimetable);
     }
 }

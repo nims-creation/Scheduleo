@@ -22,21 +22,85 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Handle 401s (Token Expiry)
+// Track whether a refresh is already in-flight so we don't fire multiple requests
+let isRefreshing = false;
+// Queue of requests that arrived while a refresh was in-flight
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Response Interceptor: Transparent token refresh on 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Optional: Implement refresh token logic here if a 401 occurs.
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      /* 
-       For this chunk, we simply wipe and redirect if unauth
-       In the future, hit /api/v1/auth/refresh-token here!
-      */
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-      window.dispatchEvent(new Event('auth-expired'));
+    // Only attempt refresh on 401, and never retry the refresh call itself
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/api/v1/auth/refresh-token')
+    ) {
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      // No refresh token stored — force logout
+      if (!refreshToken) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        window.dispatchEvent(new Event('auth-expired'));
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        // Queue this request until the in-flight refresh completes
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const { data } = await axios.post(`${API_URL}/api/v1/auth/refresh-token`, {
+          refreshToken,
+        });
+
+        const newAccessToken = data.data?.accessToken;
+        localStorage.setItem('accessToken', newAccessToken);
+
+        // Update default header for future requests
+        api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+
+        processQueue(null, newAccessToken);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        // Refresh failed — session truly expired, force logout
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        window.dispatchEvent(new Event('auth-expired'));
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
 
     return Promise.reject(error);

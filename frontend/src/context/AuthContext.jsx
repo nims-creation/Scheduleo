@@ -4,7 +4,9 @@ import api from '../services/api';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  // Lazy initializer avoids calling setState synchronously inside an effect
+  const [loading, setLoading] = useState(true);
+
+  // Lazy initializer — reads from localStorage synchronously on first render
   const [user, setUser] = useState(() => {
     try {
       const storedUser = localStorage.getItem('user');
@@ -15,7 +17,12 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  // Listen for 401s
+  // Mark loading done after first mount (localStorage read is synchronous)
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  // Listen for 401s fired by the api.js interceptor after refresh fails
   useEffect(() => {
     const handleAuthExpired = () => setUser(null);
     window.addEventListener('auth-expired', handleAuthExpired);
@@ -53,12 +60,12 @@ export const AuthProvider = ({ children }) => {
   const loginWithToken = async (token) => {
     try {
       localStorage.setItem('accessToken', token);
-      
-      // Fetch user profile
+
+      // Fetch user profile using the new token
       const { data } = await api.get('/api/v1/users/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (data.success) {
         const userData = data.data;
         localStorage.setItem('user', JSON.stringify(userData));
@@ -75,7 +82,6 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (userData) => {
     try {
-      // Schedulo API payload standard for creating accounts
       const payload = { ...userData, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone };
       const { data } = await api.post('/api/v1/auth/signup', payload);
       if (data.success) {
@@ -103,8 +109,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    // Optionally hit /api/v1/auth/logout with refreshToken here
+  const logout = async () => {
+    // Invalidate refresh token on the server so it can't be reused
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+      try {
+        await api.post(`/api/v1/auth/logout?refreshToken=${encodeURIComponent(refreshToken)}`);
+      } catch {
+        // Ignore network errors — clear local state regardless
+      }
+    }
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
@@ -112,7 +126,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, loginWithToken, signup, logout, loading: false }}>
+    <AuthContext.Provider value={{ user, login, loginWithToken, signup, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

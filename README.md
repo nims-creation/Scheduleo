@@ -5,7 +5,7 @@
 **A premium B2B Software-as-a-Service platform that eliminates the complexity of manual scheduling. Schedulo generates conflict-free timetables for educational institutions, businesses, and hospitals using an automated constraint-satisfaction engine.**
 
 [![Build](https://github.com/nims-creation/Scheduleo/actions/workflows/build.yml/badge.svg)](https://github.com/nims-creation/Scheduleo/actions)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.0-brightgreen.svg?logo=spring)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.0-brightgreen.svg?logo=spring)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-18-blue.svg?logo=react)](https://reactjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg?logo=postgresql)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7-red.svg?logo=redis)](https://redis.io/)
@@ -104,7 +104,7 @@ flowchart TD
 | Domain | Technologies |
 |---|---|
 | **Frontend** | React 18, Vite, Context API, React Router v6, Axios, Recharts, Lucide Icons, Vanilla CSS |
-| **Backend** | Java 21, Spring Boot 3.4.0, Spring Security, Spring Data JPA, Hibernate ORM |
+| **Backend** | Java 21, Spring Boot 3.3.0, Spring Security, Spring Data JPA, Hibernate ORM |
 | **Database** | PostgreSQL 16 (Supabase managed), Redis 7 |
 | **Auth** | JWT (RS256), Google OAuth2, BCrypt |
 | **Payments** | Stripe Payment Gateway (simulated), multi-currency support |
