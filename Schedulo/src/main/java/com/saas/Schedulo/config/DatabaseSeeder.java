@@ -16,38 +16,42 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
+        // Wrap entirely — if DB is unreachable at startup the app still boots.
+        // Health check will surface the real connection state.
         try {
-            log.info("Fixing dual-entity constraint conflicts on resources table...");
-            jdbcTemplate.execute("ALTER TABLE resources ALTER COLUMN resource_type DROP NOT NULL");
-            jdbcTemplate.execute("ALTER TABLE resources ALTER COLUMN type DROP NOT NULL");
-            jdbcTemplate.execute("ALTER TABLE resources ALTER COLUMN is_bookable DROP NOT NULL");
-            jdbcTemplate.execute("ALTER TABLE resources ALTER COLUMN requires_approval DROP NOT NULL");
+            tryAlterResourcesTable();
+            seedRoles();
         } catch (Exception e) {
-            log.warn("Could not alter resources table (might be first run or missing table): {}", e.getMessage());
+            log.error("DatabaseSeeder failed (DB may be unreachable): {}", e.getMessage());
         }
+    }
 
-        if (roleRepository.count() == 0) {
-            log.info("Seeding database with default roles...");
-
-            Role userRole = Role.builder()
-                    .name("ROLE_USER")
-                    .description("Standard User Role")
-                    .isSystemRole(true)
-                    .build();
-
-            Role adminRole = Role.builder()
-                    .name("ROLE_ADMIN")
-                    .description("Administrator Role")
-                    .isSystemRole(true)
-                    .build();
-
-            roleRepository.save(userRole);
-            roleRepository.save(adminRole);
-
-            log.info("Successfully seeded database with {} roles.", roleRepository.count());
-        } else {
-            log.info("Database already contains roles. Skipping seeder.");
+    private void tryAlterResourcesTable() {
+        String[] statements = {
+            "ALTER TABLE resources ALTER COLUMN resource_type DROP NOT NULL",
+            "ALTER TABLE resources ALTER COLUMN type DROP NOT NULL",
+            "ALTER TABLE resources ALTER COLUMN is_bookable DROP NOT NULL",
+            "ALTER TABLE resources ALTER COLUMN requires_approval DROP NOT NULL"
+        };
+        for (String sql : statements) {
+            try {
+                jdbcTemplate.execute(sql);
+            } catch (Exception e) {
+                log.debug("ALTER skipped (column may not exist): {}", e.getMessage());
+            }
         }
+    }
+
+    private void seedRoles() {
+        if (roleRepository.count() > 0) {
+            log.info("Roles already exist — skipping seed.");
+            return;
+        }
+        log.info("Seeding default roles...");
+        roleRepository.save(Role.builder().name("ROLE_USER").description("Standard User Role").isSystemRole(true).build());
+        roleRepository.save(Role.builder().name("ROLE_ADMIN").description("Administrator Role").isSystemRole(true).build());
+        roleRepository.save(Role.builder().name("ROLE_MEMBER").description("Organisation Member").isSystemRole(true).build());
+        log.info("Seeded {} roles.", roleRepository.count());
     }
 }

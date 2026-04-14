@@ -38,8 +38,6 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        # Must be explicit — prevents startup crash when JDBC metadata is unavailable
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
         default_schema: public
         jdbc:
