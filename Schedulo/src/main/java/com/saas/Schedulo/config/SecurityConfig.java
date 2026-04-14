@@ -7,7 +7,7 @@ import com.saas.Schedulo.security.oauth2.CustomOAuth2UserService;
 import com.saas.Schedulo.security.oauth2.OAuth2AuthenticationFailureHandler;
 import com.saas.Schedulo.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.saas.Schedulo.security.ratelimit.RateLimitFilter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -34,21 +33,39 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
-@RequiredArgsConstructor
 public class SecurityConfig {
 
+    // ── Required beans ──────────────────────────────────────────────────────
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
-    private final OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id:disabled}")
+    // ── Optional OAuth2 beans (null when GOOGLE_CLIENT_ID is not set) ────────
+    // Using field injection with required=false avoids forcing Spring Security
+    // to demand a ClientRegistrationRepository at context startup.
+    @Autowired(required = false)
+    private CustomOAuth2UserService customOAuth2UserService;
+
+    @Autowired(required = false)
+    private OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
+
+    @Autowired(required = false)
+    private OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id:}")
     private String googleClientId;
 
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
+
+    @Autowired
+    public SecurityConfig(CustomUserDetailsService userDetailsService,
+                          JwtAuthenticationFilter jwtAuthenticationFilter,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+        this.userDetailsService = userDetailsService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -83,10 +100,12 @@ public class SecurityConfig {
                 .addFilterBefore(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Only configure OAuth2 login when real Google credentials are provided
+        // Only configure OAuth2 login when real Google credentials are provided.
+        // Defaults to blank ("") in application.yml when env var is absent, so
+        // isBlank() is the primary guard. The "disabled" check is a safety net.
         boolean oauth2Enabled = googleClientId != null
                 && !googleClientId.isBlank()
-                && !googleClientId.equals("disabled");
+                && !googleClientId.equalsIgnoreCase("disabled");
 
         if (oauth2Enabled) {
             http.oauth2Login(oauth2 -> oauth2

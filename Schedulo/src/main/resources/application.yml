@@ -38,10 +38,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        # Must be explicit — when DB is unreachable at startup, Hibernate cannot
-        # auto-detect the dialect from JDBC metadata, causing a hard crash.
-        # The HHH90000025 deprecation warning this produces is acceptable.
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        # Dialect is auto-detected from the JDBC driver (HHH90000025 fixed)
         format_sql: false
         default_schema: public
         jdbc:
@@ -80,14 +77,18 @@ spring:
           starttls:
             enable: true
 
-  # ── OAuth2 (conditionally enabled in SecurityConfig) ──────
+  # ── OAuth2 (only registered when real credentials are provided) ──
+  # Omit this entire block unless GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
+  # are real values. Spring auto-config creates a ClientRegistrationRepository
+  # from any present registration key — a placeholder like "disabled" still
+  # triggers the bean and causes a startup crash when oauth2Login() is called.
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID:disabled}
-            client-secret: ${GOOGLE_CLIENT_SECRET:disabled}
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
             scope: email, profile
 
 # ── Server ────────────────────────────────────────────────
