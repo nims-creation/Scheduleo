@@ -33,8 +33,8 @@ spring:
   # ── JPA / Hibernate ───────────────────────────────────────
   jpa:
     hibernate:
-      # Temporarily set to 'update' so Render can create missing tables on Supabase
-      ddl-auto: update
+      # Set to none for production speed. Schema is already initialized in Supabase.
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
