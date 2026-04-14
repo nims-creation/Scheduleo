@@ -49,7 +49,7 @@ const Dashboard = () => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- fetchNotifications is stable
+  }, []);
 
   const handleMarkAsRead = async (id) => {
     try {

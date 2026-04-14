@@ -4,7 +4,8 @@ import api from '../services/api';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [loading, setLoading] = useState(true);
+  // loading starts false — localStorage read in useState initializer is synchronous
+  const [loading] = useState(false);
 
   // Lazy initializer — reads from localStorage synchronously on first render
   const [user, setUser] = useState(() => {
@@ -16,11 +17,6 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
-
-  // Mark loading done after first mount (localStorage read is synchronous)
-  useEffect(() => {
-    setLoading(false);
-  }, []);
 
   // Listen for 401s fired by the api.js interceptor after refresh fails
   useEffect(() => {
