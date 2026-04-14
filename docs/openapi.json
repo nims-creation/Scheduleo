@@ -1,0 +1,402 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Schedulo API",
+    "description": "REST API for Schedulo — a multi-tenant SaaS platform for intelligent timetable generation and schedule management. Import this file into Postman via File → Import, or use the live Swagger UI at https://schedulo-api.onrender.com/swagger-ui.html for an interactive version with your real server.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Schedulo Team",
+      "url": "https://schedulo-frontend.onrender.com"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://schedulo-api.onrender.com",
+      "description": "Production (Render)"
+    },
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    { "name": "Authentication", "description": "Login, signup, token refresh, and logout" },
+    { "name": "Users",          "description": "User profile and team member management" },
+    { "name": "Organizations",  "description": "Organisation settings and configuration" },
+    { "name": "Timetables",     "description": "Timetable CRUD and publish lifecycle" },
+    { "name": "Schedules",      "description": "Schedule entry management and conflict detection" },
+    { "name": "Subscriptions",  "description": "Plan management and billing" },
+    { "name": "Payments",       "description": "Payment processing and invoices" },
+    { "name": "Webhooks",       "description": "Stripe webhook receiver" }
+  ],
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Authenticate with email + password. Returns JWT access and refresh tokens.\n\n**Rate limit:** 5 requests per 15 minutes per IP.",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" },
+              "example": {
+                "email": "admin@example.com",
+                "password": "Password123!"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthResponse" }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials" },
+          "423": { "description": "Account locked after repeated failures" },
+          "429": { "description": "Rate limit exceeded — try again after 15 minutes" }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/signup": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User registration",
+        "description": "Register a new user and optionally create an organisation. Returns tokens immediately.\n\n**Rate limit:** 3 requests per 60 minutes per IP.",
+        "operationId": "signup",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SignupRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Account created successfully" },
+          "409": { "description": "Email already registered" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/refresh-token": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh access token",
+        "description": "Exchange a valid refresh token for a new access token (token rotation).",
+        "operationId": "refreshToken",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshTokenRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "New access token issued" },
+          "401": { "description": "Refresh token expired or revoked" }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout",
+        "description": "Revokes the refresh token server-side so it cannot be reused.",
+        "operationId": "logout",
+        "parameters": [
+          {
+            "name": "refreshToken",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Logged out successfully" }
+        }
+      }
+    },
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Initiate password reset",
+        "parameters": [
+          { "name": "email", "in": "query", "required": true, "schema": { "type": "string", "format": "email" } }
+        ],
+        "responses": {
+          "200": { "description": "Reset email sent if account exists (always 200 to prevent enumeration)" }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Reset password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PasswordResetRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset successfully" },
+          "400": { "description": "Token invalid or expired" }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get current user profile",
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": { "description": "User profile" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/organizations": {
+      "get": {
+        "tags": ["Organizations"],
+        "summary": "Get current user's organisation",
+        "responses": { "200": { "description": "Organisation details" } }
+      },
+      "put": {
+        "tags": ["Organizations"],
+        "summary": "Update organisation settings",
+        "responses": { "200": { "description": "Updated organisation" } }
+      }
+    },
+    "/api/v1/timetables": {
+      "get": {
+        "tags": ["Timetables"],
+        "summary": "List timetables for the organisation",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 0 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["DRAFT","PUBLISHED","ARCHIVED"] } }
+        ],
+        "responses": { "200": { "description": "Paginated list of timetables" } }
+      },
+      "post": {
+        "tags": ["Timetables"],
+        "summary": "Create a new timetable",
+        "responses": {
+          "201": { "description": "Timetable created" },
+          "409": { "description": "Conflict detected in schedule entries" }
+        }
+      }
+    },
+    "/api/v1/timetables/{id}": {
+      "get": {
+        "tags": ["Timetables"],
+        "summary": "Get timetable by ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "Timetable detail" }, "404": { "description": "Not found" } }
+      },
+      "put": {
+        "tags": ["Timetables"],
+        "summary": "Update timetable",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "Updated" } }
+      },
+      "delete": {
+        "tags": ["Timetables"],
+        "summary": "Delete (soft) timetable",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "204": { "description": "Deleted" } }
+      }
+    },
+    "/api/v1/timetables/{id}/publish": {
+      "post": {
+        "tags": ["Timetables"],
+        "summary": "Publish a timetable",
+        "description": "Validates all entries for conflicts before publishing. Returns 409 if conflicts exist.",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": {
+          "200": { "description": "Published successfully" },
+          "409": { "description": "Conflict detected — resolve before publishing" }
+        }
+      }
+    },
+    "/api/v1/schedules/conflicts": {
+      "post": {
+        "tags": ["Schedules"],
+        "summary": "Check for scheduling conflicts",
+        "description": "Checks a proposed schedule entry for resource, user, and participant conflicts without persisting anything.",
+        "responses": {
+          "200": { "description": "Conflict check result", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConflictCheckResponse" } } } }
+        }
+      }
+    },
+    "/api/v1/subscriptions/plans": {
+      "get": {
+        "tags": ["Subscriptions"],
+        "summary": "List available subscription plans",
+        "responses": { "200": { "description": "List of plans (FREE / PRO / ENTERPRISE)" } },
+        "security": []
+      }
+    },
+    "/api/v1/payments/initiate": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Initiate a payment",
+        "responses": { "200": { "description": "Payment session created" } }
+      }
+    },
+    "/api/v1/webhooks/stripe": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Stripe webhook receiver",
+        "description": "Receives Stripe payment events. Verified via Stripe-Signature header.",
+        "responses": { "200": { "description": "Event processed" } },
+        "security": []
+      }
+    },
+    "/actuator/health": {
+      "get": {
+        "tags": ["Monitoring"],
+        "summary": "Health check",
+        "description": "Used by Render health checks and UptimeRobot pings to prevent cold starts.",
+        "responses": { "200": { "description": "Application is healthy" } },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Paste your access token here. Obtain one via POST /api/v1/auth/login"
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email":    { "type": "string", "format": "email", "example": "admin@example.com" },
+          "password": { "type": "string", "minLength": 8,    "example": "Password123!" }
+        }
+      },
+      "SignupRequest": {
+        "type": "object",
+        "required": ["email", "password", "confirmPassword", "firstName", "lastName"],
+        "properties": {
+          "email":            { "type": "string", "format": "email" },
+          "password":         { "type": "string", "minLength": 8 },
+          "confirmPassword":  { "type": "string" },
+          "firstName":        { "type": "string" },
+          "lastName":         { "type": "string" },
+          "phoneNumber":      { "type": "string" },
+          "organizationName": { "type": "string", "description": "If provided, a new organisation is created and the user becomes admin" },
+          "organizationType": { "type": "string", "enum": ["SCHOOL","UNIVERSITY","HOSPITAL","BUSINESS","OTHER"] },
+          "timezone":         { "type": "string", "example": "Asia/Kolkata" }
+        }
+      },
+      "RefreshTokenRequest": {
+        "type": "object",
+        "required": ["refreshToken"],
+        "properties": {
+          "refreshToken": { "type": "string" }
+        }
+      },
+      "PasswordResetRequest": {
+        "type": "object",
+        "required": ["token", "newPassword", "confirmPassword"],
+        "properties": {
+          "token":           { "type": "string" },
+          "newPassword":     { "type": "string", "minLength": 8 },
+          "confirmPassword": { "type": "string" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "success":      { "type": "boolean", "example": true },
+          "message":      { "type": "string",  "example": "Login successful" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "accessToken":  { "type": "string" },
+              "refreshToken": { "type": "string" },
+              "tokenType":    { "type": "string", "example": "Bearer" },
+              "expiresAt":    { "type": "string", "format": "date-time" },
+              "user": {
+                "type": "object",
+                "properties": {
+                  "id":              { "type": "string", "format": "uuid" },
+                  "email":           { "type": "string" },
+                  "firstName":       { "type": "string" },
+                  "lastName":        { "type": "string" },
+                  "fullName":        { "type": "string" },
+                  "profileImageUrl": { "type": "string" },
+                  "roles":           { "type": "array", "items": { "type": "string" } },
+                  "organization": {
+                    "type": "object",
+                    "properties": {
+                      "id":   { "type": "string", "format": "uuid" },
+                      "name": { "type": "string" },
+                      "slug": { "type": "string" },
+                      "type": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ConflictCheckResponse": {
+        "type": "object",
+        "properties": {
+          "hasConflicts": { "type": "boolean" },
+          "conflicts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "conflictType": { "type": "string", "enum": ["RESOURCE", "ASSIGNED_USER", "PARTICIPANT"] },
+                "message":      { "type": "string" },
+                "existingEntry": { "type": "object" }
+              }
+            }
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success":   { "type": "boolean" },
+          "message":   { "type": "string" },
+          "data":      { "type": "object" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}

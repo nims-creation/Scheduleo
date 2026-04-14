@@ -6,6 +6,7 @@ import com.saas.Schedulo.security.jwt.JwtAuthenticationFilter;
 import com.saas.Schedulo.security.oauth2.CustomOAuth2UserService;
 import com.saas.Schedulo.security.oauth2.OAuth2AuthenticationFailureHandler;
 import com.saas.Schedulo.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import com.saas.Schedulo.security.ratelimit.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -78,6 +79,8 @@ public class SecurityConfig {
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
+                // Rate limiting runs first — before JWT processing
+                .addFilterBefore(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Only configure OAuth2 login when real Google credentials are provided

@@ -22,7 +22,7 @@
 Schedulo is a **multi-tenant SaaS platform** that automates the creation of complex timetables. Organisations sign up, configure their resources (rooms, staff, equipment), define constraints, and let the AI-powered engine generate a complete, conflict-free schedule — in milliseconds.
 
 Built with:
-- ☕ **Java 21 + Spring Boot 3.4** — scalable, production-grade REST API
+- ☕ **Java 21 + Spring Boot 3.3.0** — scalable, production-grade REST API
 - ⚛️ **React 18 + Vite** — fast, responsive Single Page Application
 - 🐘 **PostgreSQL (Supabase)** — managed relational database
 - 🔴 **Redis** — session management and caching
@@ -228,13 +228,31 @@ The pipeline runs on every push to `main`:
 
 ---
 
+## 📄 API Documentation
+
+The full OpenAPI 3.0 specification is committed to the repo for offline browsing and Postman import.
+
+| Resource | Link |
+|---|---|
+| **Swagger UI (live)** | https://schedulo-api.onrender.com/swagger-ui.html |
+| **OpenAPI JSON (static)** | [docs/openapi.json](./docs/openapi.json) |
+
+**Import into Postman:**
+1. Open Postman → Import → Link
+2. Paste: `https://schedulo-api.onrender.com/v3/api-docs`
+   — OR —
+   File → Import → select `docs/openapi.json` for offline use
+
+---
+
 ## 🔐 Security Design
 
 - **Stateless JWT** — access tokens (15 min) + refresh tokens (7 days) stored in `localStorage`
 - **Google OAuth2** — server-side redirect flow; tokens resolved by Spring Security
 - **RBAC** — `ROLE_ADMIN` / `ROLE_MEMBER` enforced at method and endpoint level
 - **CORS** — strictly scoped to the frontend origin
-- **Rate Limiting** — Redis-backed per-IP rate limiter on auth endpoints
+- **Account Lockout** — Automatic account lock after 5 failed login attempts (30-minute cooldown)
+- **Rate Limiting** — Bucket4j token-bucket: 5 login / 3 signup requests per IP per 15–60 min window
 - **BCrypt** — passwords hashed with strength factor 12
 
 ---
