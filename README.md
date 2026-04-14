@@ -11,7 +11,7 @@
 [![Redis](https://img.shields.io/badge/Redis-7-red.svg?logo=redis)](https://redis.io/)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 
-🌐 **Live Demo:** [schedulo-frontend.onrender.com](https://schedulo-frontend.onrender.com) &nbsp;|&nbsp; 🔧 **API:** [schedulo-api.onrender.com](https://schedulo-api.onrender.com/swagger-ui.html)
+🌐 **Live Demo:** [scheduleo.vercel.app](https://scheduleo.vercel.app) &nbsp;|&nbsp; 🔧 **API:** [schedulo-api.onrender.com](https://schedulo-api.onrender.com/swagger-ui.html)
 
 </div>
 
@@ -26,7 +26,7 @@ Built with:
 - ⚛️ **React 18 + Vite** — fast, responsive Single Page Application
 - 🐘 **PostgreSQL (Supabase)** — managed relational database
 - 🔴 **Redis** — session management and caching
-- 🚀 **Deployed on Render** — fully automated CI/CD via GitHub Actions
+- 🚀 **Deployed on Vercel (Frontend) & Render (Backend)** — fully automated CI/CD
 
 ---
 
@@ -36,7 +36,7 @@ A modern, highly scalable 3-tier architecture designed for enterprise readiness,
 
 ```mermaid
 flowchart TD
-    subgraph Client ["Client Tier"]
+    subgraph Client ["Client Tier (Hosted on Vercel)"]
         frontend("React / Vite SPA")
     end
 
@@ -46,7 +46,7 @@ flowchart TD
         openai("OpenAI ChatBot")
     end
 
-    subgraph App ["Application Server (Spring Boot)"]
+    subgraph App ["Application Server (Spring Boot on Render)"]
         gateway("API Gateway & JWT Auth")
         engine("Scheduling Engine")
         core("Multi-Tenant Core")
@@ -111,7 +111,7 @@ flowchart TD
 | **Notifications** | Resend (email), ClickSend (SMS), Twilio (WhatsApp) |
 | **AI** | OpenAI API (chatbot assistant) |
 | **Storage** | Supabase Storage |
-| **DevOps** | GitHub Actions CI/CD, Docker Compose, Render (PaaS) |
+| **DevOps** | Vercel (Frontend), Render (PaaS Backend), Docker Compose, GitHub Actions |
 | **Docs** | Swagger / OpenAPI 3 |
 | **Tooling** | Maven, NPM, ESLint, Git |
 
@@ -212,14 +212,14 @@ npm run dev
 
 ## 🌐 Production Deployment (Render)
 
-Both the backend and frontend are deployed on **Render** via GitHub Actions CI/CD.
+The frontend is deployed as a static site on **Vercel**, and the backend is deployed as a Web Service on **Render**.
 
-| Service | URL |
-|---|---|
-| **Frontend** | https://schedulo-frontend.onrender.com |
-| **Backend API** | https://schedulo-api.onrender.com |
-| **Swagger UI** | https://schedulo-api.onrender.com/swagger-ui.html |
-| **Database** | Supabase (PostgreSQL — transaction pooler) |
+| Service | URL | Platform |
+|---|---|---|
+| **Frontend** | https://scheduleo.vercel.app | Vercel |
+| **Backend API** | https://schedulo-api.onrender.com | Render |
+| **Swagger UI** | https://schedulo-api.onrender.com/swagger-ui.html | Render |
+| **Database** | Supabase (PostgreSQL — transaction pooler) | Supabase |
 
 The pipeline runs on every push to `main`:
 1. **Lint** — ESLint checks the entire frontend codebase
