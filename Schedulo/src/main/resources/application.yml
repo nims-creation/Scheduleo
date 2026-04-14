@@ -38,7 +38,10 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        # Dialect is auto-detected from the JDBC driver (HHH90000025 fixed)
+        # Must be explicit — when DB is unreachable at startup, Hibernate cannot
+        # auto-detect the dialect from JDBC metadata, causing a hard crash.
+        # The HHH90000025 deprecation warning this produces is acceptable.
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
         default_schema: public
         jdbc:
