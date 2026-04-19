@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../services/api';
-import { Calendar, Mail, Lock, Loader2 } from 'lucide-react';
+import { useServerWakeup } from '../hooks/useServerWakeup';
+import { Calendar, Mail, Lock, Loader2, Zap } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ const Login = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { isWakingUp } = useServerWakeup();
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
@@ -70,6 +72,13 @@ const Login = () => {
           <p style={{ color: 'var(--text-secondary)' }}>Sign in to continue to your dashboard</p>
         </div>
 
+        {isWakingUp && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(251, 191, 36, 0.08)', color: '#fbbf24', border: '1px solid rgba(251, 191, 36, 0.2)', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', fontSize: '0.8rem' }}>
+            <Zap size={14} style={{ flexShrink: 0 }} />
+            Server is starting up — this only takes a few seconds…
+          </div>
+        )}
+
         {error && (
           <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
             {error}
@@ -116,9 +125,9 @@ const Login = () => {
             type="submit" 
             className="btn btn-primary" 
             style={{ width: '100%', marginTop: '1rem' }}
-            disabled={isLoading}
+            disabled={isLoading || isWakingUp}
           >
-            {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Sign In'}
+            {isLoading ? <Loader2 className="animate-spin" size={20} /> : isWakingUp ? 'Starting server…' : 'Sign In'}
           </button>
         </form>
 
