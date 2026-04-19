@@ -20,7 +20,13 @@ public class CustomUserDetails implements UserDetails {
     private final Collection<? extends GrantedAuthority> authorities;
     private final boolean enabled;
     private final boolean accountNonLocked;
+
+    // Kept in memory so AuthServiceImpl can access the entity after authenticate()
+    // without a second DB round-trip. Not serialized.
+    private final transient User user;
+
     public CustomUserDetails(User user) {
+        this.user = user;
         this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPasswordHash();

@@ -23,6 +23,7 @@ import com.saas.Schedulo.repository.organization.OrganizationRepository;
 import com.saas.Schedulo.repository.user.RefreshTokenRepository;
 import com.saas.Schedulo.repository.user.RoleRepository;
 import com.saas.Schedulo.repository.user.UserRepository;
+import com.saas.Schedulo.security.CustomUserDetails;
 import com.saas.Schedulo.security.jwt.JwtTokenProvider;
 import com.saas.Schedulo.service.auth.AuthService;
 import com.saas.Schedulo.util.SlugGenerator;
@@ -64,17 +65,22 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse login(LoginRequest request) {
         log.info("Login attempt for email: {}", request.getEmail());
 
-        User user = userRepository.findByEmailIgnoreCase(request.getEmail())
+        // Check lock status first (single lightweight query before the expensive bcrypt compare)
+        User preCheck = userRepository.findByEmailIgnoreCase(request.getEmail())
                 .orElseThrow(() -> new AuthenticationException("Invalid email or password"));
 
-        if (user.isAccountLocked()) {
+        if (preCheck.isAccountLocked()) {
             throw new AuthenticationException("Account is locked. Please try again later.");
         }
 
         try {
+            // authenticate() internally calls loadUserByUsername → one DB round-trip + bcrypt compare
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
+
+            // Extract the already-loaded User from the principal — no extra DB call needed
+            User user = ((CustomUserDetails) authentication.getPrincipal()).getUser();
 
             userRepository.resetLoginAttempts(user.getId());
             userRepository.updateLastLogin(user.getId(), LocalDateTime.now());
@@ -86,11 +92,13 @@ public class AuthServiceImpl implements AuthService {
 
             return buildAuthResponse(user, accessToken, refreshToken.getToken());
 
+        } catch (AuthenticationException e) {
+            throw e;
         } catch (Exception e) {
-            userRepository.incrementFailedLoginAttempts(user.getId());
-            if (user.getFailedLoginAttempts() >= 5) {
-                user.setAccountLockedUntil(LocalDateTime.now().plusMinutes(30));
-                userRepository.save(user);
+            userRepository.incrementFailedLoginAttempts(preCheck.getId());
+            if (preCheck.getFailedLoginAttempts() >= 4) { // 4 past + this = 5
+                preCheck.setAccountLockedUntil(LocalDateTime.now().plusMinutes(30));
+                userRepository.save(preCheck);
             }
             throw new AuthenticationException("Invalid email or password");
         }
