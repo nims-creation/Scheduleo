@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class PasswordEncoderConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
+        // Strength 10 = Spring Security default (~100ms/hash, 2^10 rounds).
+        // Strength 12 (~1500ms/hash) caused 2-3 min auth delays on Render free tier.
+        return new BCryptPasswordEncoder(10);
     }
 }
