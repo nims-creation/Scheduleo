@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LogOut, Calendar, Clock, Users, LayoutDashboard, Zap, Layers, Server, Bell, Check, CreditCard, BarChart3, Activity, BookOpen } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import DashboardHome from './dashboard/DashboardHome';
@@ -213,7 +214,9 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
-            
+
+            <ThemeToggle />
+
             <div style={{ padding: '0.3rem 0.75rem', background: 'rgba(16,217,160,0.12)', border: '1px solid rgba(16,217,160,0.25)', borderRadius: '2rem', fontSize: '0.72rem', color: 'var(--brand-accent)', fontWeight: 600 }}>
               ● LIVE
             </div>

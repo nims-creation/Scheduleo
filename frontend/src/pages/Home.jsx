@@ -1,6 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, Users, ArrowRight, Zap, Shield, BarChart3, CheckCircle, Star } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 const features = [
   { icon: Zap, title: 'AI-Powered Generation', desc: 'Our intelligent engine automatically schedules classes, avoiding conflicts and optimizing resource usage.', color: 'var(--brand-primary)', bg: 'rgba(79,142,247,0.1)' },
@@ -17,7 +18,7 @@ const Home = () => {
   return (
     <div className="page-wrapper" style={{ background: 'var(--bg-primary)' }}>
       {/* Navigation */}
-      <nav style={{ padding: '1.25rem 2rem', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(16px)', background: 'rgba(10,12,16,0.85)' }}>
+      <nav style={{ padding: '1.25rem 2rem', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(16px)', background: 'var(--bg-glass)', transition: 'background 0.35s ease' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{ background: 'var(--brand-gradient)', padding: '0.5rem', borderRadius: 'var(--radius-sm)', boxShadow: '0 4px 12px rgba(79,142,247,0.4)' }}>
@@ -26,6 +27,7 @@ const Home = () => {
             <span style={{ fontSize: '1.3rem', fontWeight: 800, letterSpacing: '-0.02em' }}>Schedulo</span>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <ThemeToggle />
             <Link to="/login" className="btn btn-secondary" style={{ padding: '0.6rem 1.25rem', fontSize: '0.875rem' }}>Login</Link>
             <Link to="/signup" className="btn btn-primary" style={{ padding: '0.6rem 1.25rem', fontSize: '0.875rem' }}>Get Started Free</Link>
           </div>

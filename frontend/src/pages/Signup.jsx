@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../services/api';
 import { useServerWakeup } from '../hooks/useServerWakeup';
 import { Calendar, Mail, Lock, User, Loader2, Building, Zap } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -52,6 +53,11 @@ const Signup = () => {
           </div>
           <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Schedulo</span>
         </Link>
+      </div>
+
+      {/* Theme Toggle — top right */}
+      <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}>
+        <ThemeToggle />
       </div>
 
       <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '500px', padding: '2.5rem', margin: '4rem 0' }}>
