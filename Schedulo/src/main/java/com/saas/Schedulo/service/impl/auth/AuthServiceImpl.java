@@ -31,6 +31,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -93,14 +96,23 @@ public class AuthServiceImpl implements AuthService {
             return buildAuthResponse(user, accessToken, refreshToken.getToken());
 
         } catch (AuthenticationException e) {
+            // Our own well-typed exceptions — re-throw as-is
             throw e;
-        } catch (Exception e) {
+        } catch (LockedException e) {
+            throw new AuthenticationException("Account is locked. Please try again later.");
+        } catch (DisabledException e) {
+            throw new AuthenticationException("Account is disabled. Please contact support.");
+        } catch (BadCredentialsException e) {
+            // Increment failed-attempts only for genuinely wrong passwords
             userRepository.incrementFailedLoginAttempts(preCheck.getId());
             if (preCheck.getFailedLoginAttempts() >= 4) { // 4 past + this = 5
                 preCheck.setAccountLockedUntil(LocalDateTime.now().plusMinutes(30));
                 userRepository.save(preCheck);
             }
             throw new AuthenticationException("Invalid email or password");
+        } catch (Exception e) {
+            log.error("Unexpected error during login for {}: {}", request.getEmail(), e.getMessage(), e);
+            throw new AuthenticationException("Login failed. Please try again.");
         }
     }
 
