@@ -31,7 +31,11 @@ public class CustomUserDetails implements UserDetails {
         this.email = user.getEmail();
         this.password = user.getPasswordHash();
         this.organizationId = user.getOrganization() != null ? user.getOrganization().getId() : null;
-        this.enabled = user.getIsActive() && user.getEmailVerified();
+        // Only gate on isActive (soft-delete / admin-disabled).
+        // emailVerified is intentionally excluded: the app has no email-sending
+        // infrastructure yet, so every signup would produce emailVerified=false
+        // and make login permanently impossible for local users.
+        this.enabled = user.getIsActive();
         this.accountNonLocked = !user.isAccountLocked();
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
