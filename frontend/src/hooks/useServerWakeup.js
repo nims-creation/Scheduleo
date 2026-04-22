@@ -18,7 +18,6 @@ export function useServerWakeup() {
     let cancelled = false;
     const SLOW_THRESHOLD_MS = 2000; // only show banner if cold-start takes > 2s
 
-    const start = Date.now();
     const timer = setTimeout(() => {
       // If no response yet after threshold → server is probably cold
       if (!cancelled) setIsWakingUp(true);
