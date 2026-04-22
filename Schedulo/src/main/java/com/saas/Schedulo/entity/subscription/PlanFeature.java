@@ -27,12 +27,14 @@ public class PlanFeature extends BaseEntity {
     private String description;
 
     @Column(name = "is_enabled", nullable = false)
+    @Builder.Default
     private Boolean isEnabled = true;
 
     @Column(name = "limit_value")
     private Integer limitValue;
 
     @Column(name = "sort_order")
+    @Builder.Default
     private Integer sortOrder = 0;
 }
 

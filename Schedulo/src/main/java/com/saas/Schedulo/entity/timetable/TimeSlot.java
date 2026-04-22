@@ -37,15 +37,18 @@ public class TimeSlot extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "slot_type", nullable = false)
+    @Builder.Default
     private SlotType slotType = SlotType.REGULAR;
 
     @Column(name = "break_after", nullable = false)
+    @Builder.Default
     private Boolean breakAfter = false;
 
     @Column(name = "break_duration_minutes")
     private Integer breakDurationMinutes;
 
     @Column(name = "sort_order")
+    @Builder.Default
     private Integer sortOrder = 0;
 
     public enum SlotType {

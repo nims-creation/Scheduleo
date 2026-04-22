@@ -24,6 +24,8 @@ public class BulkScheduleRequest {
     @Valid
     private List<CreateScheduleEntryRequest> entries;
 
+    @Builder.Default
     private Boolean skipConflicts = false;
+    @Builder.Default
     private Boolean overwriteExisting = false;
 }

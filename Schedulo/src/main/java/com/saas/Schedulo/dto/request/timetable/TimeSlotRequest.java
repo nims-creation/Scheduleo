@@ -26,6 +26,7 @@ public class TimeSlotRequest {
 
     private DayOfWeek dayOfWeek;
     private String slotType;
+    @Builder.Default
     private Boolean breakAfter = false;
     private Integer breakDurationMinutes;
     private Integer sortOrder;

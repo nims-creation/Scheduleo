@@ -44,6 +44,7 @@ public class Timetable extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private TimetableStatus status = TimetableStatus.DRAFT;
 
     @Enumerated(EnumType.STRING)
@@ -59,6 +60,7 @@ public class Timetable extends BaseEntity {
     private List<ScheduleEntry> scheduleEntries = new ArrayList<>();
 
     @Column(name = "is_template", nullable = false)
+    @Builder.Default
     private Boolean isTemplate = false;
 
     @Column(name = "template_name")

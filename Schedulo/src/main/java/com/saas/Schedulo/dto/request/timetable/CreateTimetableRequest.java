@@ -37,6 +37,7 @@ public class CreateTimetableRequest {
     @Valid
     private List<TimeSlotRequest> timeSlots;
 
+    @Builder.Default
     private Boolean isTemplate = false;
     private String templateName;
 }

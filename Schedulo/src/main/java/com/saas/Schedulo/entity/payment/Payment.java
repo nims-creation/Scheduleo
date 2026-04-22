@@ -34,10 +34,12 @@ public class Payment extends BaseEntity {
     private BigDecimal amount;
 
     @Column(name = "currency", length = 3, nullable = false)
+    @Builder.Default
     private String currency = "USD";
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private PaymentStatus status = PaymentStatus.PENDING;
 
     @Enumerated(EnumType.STRING)

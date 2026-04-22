@@ -47,6 +47,7 @@ public class CalendarEvent extends BaseEntity {
     private LocalDateTime endDatetime;
 
     @Column(name = "all_day", nullable = false)
+    @Builder.Default
     private Boolean allDay = false;
 
     @Column(name = "location")
@@ -61,6 +62,7 @@ public class CalendarEvent extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "visibility", nullable = false)
+    @Builder.Default
     private EventVisibility visibility = EventVisibility.ORGANIZATION;
 
     @Column(name = "color", length = 7)
@@ -80,6 +82,7 @@ public class CalendarEvent extends BaseEntity {
     private List<EventReminder> reminders = new ArrayList<>();
 
     @Column(name = "is_recurring", nullable = false)
+    @Builder.Default
     private Boolean isRecurring = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -88,6 +91,7 @@ public class CalendarEvent extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private EventStatus status = EventStatus.CONFIRMED;
 
     public enum EventType {

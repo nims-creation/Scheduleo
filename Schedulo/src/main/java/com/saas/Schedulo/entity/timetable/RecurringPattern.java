@@ -22,6 +22,7 @@ public class RecurringPattern extends BaseEntity {
     private RecurrenceFrequency frequency;
 
     @Column(name = "interval_value", nullable = false)
+    @Builder.Default
     private Integer intervalValue = 1;
 
     @ElementCollection

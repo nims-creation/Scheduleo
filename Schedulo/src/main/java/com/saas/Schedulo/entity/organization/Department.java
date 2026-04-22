@@ -47,6 +47,7 @@ public class Department extends BaseEntity {
     private String color;
 
     @Column(name = "sort_order")
+    @Builder.Default
     private Integer sortOrder = 0;
 }
 

@@ -23,6 +23,7 @@ public class Role extends BaseEntity {
     private String description;
 
     @Column(name = "is_system_role", nullable = false)
+    @Builder.Default
     private Boolean isSystemRole = false;
 
     @ManyToMany(fetch = FetchType.EAGER)

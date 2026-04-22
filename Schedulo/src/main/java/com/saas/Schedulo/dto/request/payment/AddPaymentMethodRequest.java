@@ -14,6 +14,7 @@ public class AddPaymentMethodRequest {
     private String paymentGateway;
     @NotBlank(message = "Payment method token is required")
     private String token;
+    @Builder.Default
     private Boolean setAsDefault = false;
     private String billingEmail;
 }

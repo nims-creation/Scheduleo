@@ -45,6 +45,7 @@ public class CreateScheduleEntryRequest {
     private String entryType;
 
     private String color;
+    @Builder.Default
     private Boolean isRecurring = false;
 
     @Valid

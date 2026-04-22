@@ -19,5 +19,6 @@ public class CreateSubscriptionRequest {
     private Subscription.BillingCycle billingCycle;
     private String paymentMethodId;
     private String couponCode;
+    @Builder.Default
     private Boolean startTrial = true;
 }

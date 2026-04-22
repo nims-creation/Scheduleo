@@ -37,9 +37,11 @@ public class Holiday extends BaseEntity {
     private HolidayType holidayType;
 
     @Column(name = "is_recurring", nullable = false)
+    @Builder.Default
     private Boolean isRecurring = false;
 
     @Column(name = "is_half_day", nullable = false)
+    @Builder.Default
     private Boolean isHalfDay = false;
 
     @Column(name = "applicable_to")

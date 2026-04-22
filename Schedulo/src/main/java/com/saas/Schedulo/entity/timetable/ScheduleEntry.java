@@ -75,12 +75,14 @@ public class ScheduleEntry extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private EntryStatus status = EntryStatus.SCHEDULED;
 
     @Column(name = "color", length = 7)
     private String color;
 
     @Column(name = "is_recurring", nullable = false)
+    @Builder.Default
     private Boolean isRecurring = false;
 
     @ManyToOne(fetch = FetchType.LAZY)

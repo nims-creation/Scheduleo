@@ -27,7 +27,9 @@ public class CreateHolidayRequest {
     @NotNull(message = "Holiday type is required")
     private Holiday.HolidayType holidayType;
 
+    @Builder.Default
     private Boolean isRecurring = false;
+    @Builder.Default
     private Boolean isHalfDay = false;
     private String applicableTo;
 }

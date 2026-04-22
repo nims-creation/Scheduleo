@@ -34,6 +34,7 @@ public class RefreshToken extends BaseEntity {
     private String ipAddress;
 
     @Column(name = "is_revoked", nullable = false)
+    @Builder.Default
     private Boolean isRevoked = false;
 
     public boolean isExpired() {

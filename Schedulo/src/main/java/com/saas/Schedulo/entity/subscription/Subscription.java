@@ -30,6 +30,7 @@ public class Subscription extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private SubscriptionStatus status = SubscriptionStatus.ACTIVE;
 
     @Enumerated(EnumType.STRING)
@@ -49,12 +50,14 @@ public class Subscription extends BaseEntity {
     private LocalDateTime cancelledAt;
 
     @Column(name = "cancel_at_period_end", nullable = false)
+    @Builder.Default
     private Boolean cancelAtPeriodEnd = false;
 
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "currency", length = 3, nullable = false)
+    @Builder.Default
     private String currency = "USD";
 
     @Column(name = "discount_percentage")
@@ -70,6 +73,7 @@ public class Subscription extends BaseEntity {
     private LocalDateTime nextBillingDate;
 
     @Column(name = "auto_renew", nullable = false)
+    @Builder.Default
     private Boolean autoRenew = true;
 
     public boolean isActive() {

@@ -19,6 +19,7 @@ public class RecurringPatternRequest {
     private String frequency;
 
     @Min(1)
+    @Builder.Default
     private Integer intervalValue = 1;
 
     private Set<DayOfWeek> daysOfWeek;

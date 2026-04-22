@@ -36,6 +36,7 @@ public class SubscriptionPlan extends BaseEntity {
     private BigDecimal yearlyPrice;
 
     @Column(name = "currency", length = 3, nullable = false)
+    @Builder.Default
     private String currency = "USD";
 
     @Enumerated(EnumType.STRING)
@@ -55,6 +56,7 @@ public class SubscriptionPlan extends BaseEntity {
     private Integer maxDepartments;
 
     @Column(name = "trial_days")
+    @Builder.Default
     private Integer trialDays = 14;
 
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -62,9 +64,11 @@ public class SubscriptionPlan extends BaseEntity {
     private List<PlanFeature> features = new ArrayList<>();
 
     @Column(name = "is_popular", nullable = false)
+    @Builder.Default
     private Boolean isPopular = false;
 
     @Column(name = "sort_order")
+    @Builder.Default
     private Integer sortOrder = 0;
 
     @Column(name = "stripe_price_id_monthly")

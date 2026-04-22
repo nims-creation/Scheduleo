@@ -44,10 +44,12 @@ public class Invoice extends BaseEntity {
     private BigDecimal total;
 
     @Column(name = "currency", length = 3, nullable = false)
+    @Builder.Default
     private String currency = "USD";
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private InvoiceStatus status = InvoiceStatus.DRAFT;
 
     @Column(name = "issue_date", nullable = false)

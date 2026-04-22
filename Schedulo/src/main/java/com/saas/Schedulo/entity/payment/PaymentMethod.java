@@ -46,6 +46,7 @@ public class PaymentMethod extends BaseEntity {
     private String holderName;
 
     @Column(name = "is_default", nullable = false)
+    @Builder.Default
     private Boolean isDefault = false;
 
     @Column(name = "billing_email")

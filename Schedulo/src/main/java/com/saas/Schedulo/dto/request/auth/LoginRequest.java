@@ -17,6 +17,7 @@ public class LoginRequest {
     @NotBlank(message = "Password is required")
     private String password;
 
+    @Builder.Default
     private Boolean rememberMe = false;
     private String deviceInfo;
 }

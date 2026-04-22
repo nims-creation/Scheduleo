@@ -26,14 +26,17 @@ public class CreateEventRequest {
     private LocalDateTime startDatetime;
     @NotNull(message = "End datetime is required")
     private LocalDateTime endDatetime;
+    @Builder.Default
     private Boolean allDay = false;
     private String location;
     private String virtualMeetingUrl;
     @NotNull(message = "Event type is required")
     private String eventType;
+    @Builder.Default
     private String visibility = "ORGANIZATION";
     private String color;
     private Set<UUID> attendeeIds;
+    @Builder.Default
     private Boolean isRecurring = false;
     private com.saas.Schedulo.dto.request.timetable.RecurringPatternRequest recurringPattern;
     @AssertTrue(message = "End datetime must be after start datetime")

@@ -50,9 +50,11 @@ public class Resource extends BaseEntity {
     private String amenities;
 
     @Column(name = "is_bookable", nullable = false)
+    @Builder.Default
     private Boolean isBookable = true;
 
     @Column(name = "requires_approval", nullable = false)
+    @Builder.Default
     private Boolean requiresApproval = false;
 
     @Column(name = "hourly_rate")

@@ -25,6 +25,7 @@ public class EventReminder extends BaseEntity {
     private ReminderType reminderType;
 
     @Column(name = "is_sent", nullable = false)
+    @Builder.Default
     private Boolean isSent = false;
 
     public enum ReminderType {
