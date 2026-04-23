@@ -43,6 +43,10 @@ public class Department extends BaseEntity {
     @Builder.Default
     private List<Department> subDepartments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Batch> batches = new ArrayList<>();
+
     @Column(name = "color", length = 7)
     private String color;
 
