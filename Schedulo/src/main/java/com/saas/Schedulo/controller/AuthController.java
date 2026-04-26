@@ -76,5 +76,16 @@ public class AuthController {
         authService.verifyEmail(token);
         return ResponseEntity.ok(ApiResponse.success(null, "Email verified successfully"));
     }
+
+    /**
+     * Lightweight ping endpoint — no auth, no DB query.
+     * Called by the frontend on app boot to wake up the Render
+     * free-tier container before the user even clicks anything.
+     */
+    @GetMapping("/ping")
+    @Operation(summary = "Health ping", description = "No-auth liveness probe for cold-start wakeup")
+    public ResponseEntity<ApiResponse<String>> ping() {
+        return ResponseEntity.ok(ApiResponse.success("pong", "Server is awake"));
+    }
 }
 
