@@ -348,9 +348,9 @@ const Home = () => {
       <section className="industries-section reveal" style={{ transitionDelay: '0ms' }}>
         <p className="industries-label">Trusted across industries</p>
         <div className="industries-row">
-          {industries.map(({ icon: Icon, label }) => (
-            <div key={label} className="industry-pill">
-              <Icon size={17} /> {label}
+          {industries.map((industry) => (
+            <div key={industry.label} className="industry-pill">
+              <industry.icon size={17} /> {industry.label}
             </div>
           ))}
         </div>

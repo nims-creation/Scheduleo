@@ -1,6 +1,7 @@
 package com.saas.Schedulo.entity.timetable;
 
 import com.saas.Schedulo.entity.base.BaseEntity;
+import com.saas.Schedulo.entity.organization.Batch;
 import com.saas.Schedulo.entity.organization.Department;
 import com.saas.Schedulo.entity.organization.Organization;
 import jakarta.persistence.*;
@@ -35,6 +36,14 @@ public class Timetable extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
+
+    /**
+     * The specific batch this timetable targets (e.g. CSE-A, CSE-B).
+     * Nullable — a timetable may apply to the whole department if null.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batch_id")
+    private Batch batch;
 
     @Column(name = "effective_from", nullable = false)
     private LocalDate effectiveFrom;

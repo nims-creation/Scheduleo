@@ -4,6 +4,7 @@ import com.saas.Schedulo.security.CustomUserDetailsService;
 import com.saas.Schedulo.security.jwt.JwtAuthenticationEntryPoint;
 import com.saas.Schedulo.security.jwt.JwtAuthenticationFilter;
 import com.saas.Schedulo.security.oauth2.CustomOAuth2UserService;
+import com.saas.Schedulo.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.saas.Schedulo.security.oauth2.OAuth2AuthenticationFailureHandler;
 import com.saas.Schedulo.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.saas.Schedulo.security.ratelimit.RateLimitFilter;
@@ -51,6 +52,9 @@ public class SecurityConfig {
 
     @Autowired(required = false)
     private OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
+
+    @Autowired(required = false)
+    private HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id:}")
     private String googleClientId;
@@ -109,6 +113,9 @@ public class SecurityConfig {
 
         if (oauth2Enabled) {
             http.oauth2Login(oauth2 -> oauth2
+                    .authorizationEndpoint(authEndpoint -> authEndpoint
+                            .authorizationRequestRepository(cookieAuthorizationRequestRepository)
+                    )
                     .userInfoEndpoint(userInfo -> userInfo
                             .userService(customOAuth2UserService)
                     )

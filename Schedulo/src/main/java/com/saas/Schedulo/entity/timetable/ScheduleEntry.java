@@ -1,6 +1,7 @@
 package com.saas.Schedulo.entity.timetable;
 
 import com.saas.Schedulo.entity.base.BaseEntity;
+import com.saas.Schedulo.entity.organization.Batch;
 import com.saas.Schedulo.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -88,6 +89,15 @@ public class ScheduleEntry extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recurring_pattern_id")
     private RecurringPattern recurringPattern;
+
+    /**
+     * Optional batch override — used for split-batch entries
+     * (e.g. Lab session for CSE-A only while CSE-B has a lecture).
+     * If null, inherits the batch from the parent Timetable.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batch_id")
+    private Batch batch;
 
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;

@@ -20,6 +20,7 @@ import java.io.IOException;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
 
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
@@ -27,17 +28,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        
+
         String targetUrl = frontendUrl + "/oauth2/redirect";
-        
+
         try {
             CustomOAuth2User oauth2User = (CustomOAuth2User) authentication.getPrincipal();
             String token = jwtTokenProvider.generateAccessToken(oauth2User.getUser());
-            
+
             targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("token", token)
                     .build().toUriString();
-                    
+
             log.info("OAuth2 login successful for user: {}", oauth2User.getEmail());
         } catch (Exception e) {
             log.error("Error generating OAuth2 token", e);
@@ -45,6 +46,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     .queryParam("error", "authentication_error")
                     .build().toUriString();
         }
+
+        // Clear the OAuth2 authorization request cookie — no longer needed
+        cookieAuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
