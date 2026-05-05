@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Calendar, Clock, Users, LayoutDashboard, Zap, Layers, Server, Bell, Check, CreditCard, BarChart3, Activity, BookOpen } from 'lucide-react';
+import { LogOut, Calendar, Clock, Users, LayoutDashboard, Zap, Layers, Server, Bell, Check, CreditCard, BarChart3, Activity, BookOpen, UserX } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import api from '../services/api';
@@ -17,6 +17,7 @@ import ChatBot from '../components/ChatBot';
 import ActivityLog from './dashboard/ActivityLog';
 import Reports from './dashboard/Reports';
 import Guide from './dashboard/Guide';
+import AbsenceManagement from './dashboard/AbsenceManagement';
 
 // eslint-disable-next-line no-unused-vars
 const NavItem = ({ to, icon: Icon, label, exact }) => {
@@ -108,6 +109,7 @@ const Dashboard = () => {
           <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" exact />
           <NavItem to="/dashboard/calendar" icon={Calendar} label="Calendar" />
           <NavItem to="/dashboard/timetables" icon={Clock} label="Timetables" />
+          <NavItem to="/dashboard/absences" icon={UserX} label="Absences" />
 
           <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.1em', padding: '1rem 0.5rem 0.25rem' }}>Organization</div>
           <NavItem to="/dashboard/team" icon={Users} label={user?.organization?.type === 'HOSPITAL' ? 'Doctors & Staff' : 'Team Members'} />
@@ -238,6 +240,7 @@ const Dashboard = () => {
             <Route path="reports" element={<Reports />} />
             <Route path="activity" element={<ActivityLog />} />
             <Route path="guide" element={<Guide />} />
+            <Route path="absences" element={<AbsenceManagement />} />
           </Routes>
         </div>
         
