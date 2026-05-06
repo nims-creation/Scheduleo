@@ -1,7 +1,7 @@
 import React from 'react';
 import api from '../../services/api';
-import { BarChart3, Users, Calendar, Clock, Layers, TrendingUp, Activity, Server, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
+import { BarChart3, Users, Calendar, Clock, Layers, TrendingUp, Activity, Server, ArrowUpRight, ArrowDownRight, UserX } from 'lucide-react';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area } from 'recharts';
 // eslint-disable-next-line no-unused-vars
 const StatCard = ({ icon: Icon, label, value, change, changeType, color, gradient }) => (
   <div style={{
@@ -34,7 +34,7 @@ const StatCard = ({ icon: Icon, label, value, change, changeType, color, gradien
 const Reports = () => {
   const [stats, setStats] = React.useState({
     totalUsers: 0, totalDepartments: 0, totalTimetables: 0,
-    totalResources: 0, totalEvents: 0, recentActivities: 0,
+    totalResources: 0, totalAbsences: 0, recentActivities: 0,
   });
   const [loading, setLoading] = React.useState(true);
   const [weeklyActivity] = React.useState([
@@ -54,13 +54,16 @@ const Reports = () => {
   }, []);
 
   const fetchStats = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const monthAgo = new Date(Date.now() - 30 * 864e5).toISOString().split('T')[0];
     setLoading(true);
     try {
-      const [usersRes, deptsRes, timetablesRes, resourcesRes] = await Promise.allSettled([
+      const [usersRes, deptsRes, timetablesRes, resourcesRes, absencesRes] = await Promise.allSettled([
         api.get('/api/v1/users?size=1'),
         api.get('/api/v1/departments'),
         api.get('/api/v1/timetables?size=1'),
         api.get('/api/v1/resources'),
+        api.get(`/api/v1/absences?from=${monthAgo}&to=${today}`),
       ]);
 
       setStats({
@@ -68,7 +71,7 @@ const Reports = () => {
         totalDepartments: deptsRes.status === 'fulfilled' ? (deptsRes.value.data.data?.length || 0) : 0,
         totalTimetables: timetablesRes.status === 'fulfilled' ? (timetablesRes.value.data.data?.totalElements || timetablesRes.value.data.data?.length || 0) : 0,
         totalResources: resourcesRes.status === 'fulfilled' ? (resourcesRes.value.data.data?.length || 0) : 0,
-        totalEvents: 0,
+        totalAbsences: absencesRes.status === 'fulfilled' ? (absencesRes.value.data.data?.length || 0) : 0,
         recentActivities: 0,
       });
     } catch (err) {
@@ -105,11 +108,12 @@ const Reports = () => {
       ) : (
         <>
           {/* Stat Cards Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-            <StatCard icon={Users} label="Total Members" value={stats.totalUsers} change={12} changeType="up" color="#4f8ef7" gradient="linear-gradient(135deg, #4f8ef7, #6366f1)" />
-            <StatCard icon={Layers} label="Departments" value={stats.totalDepartments} color="#a855f7" gradient="linear-gradient(135deg, #a855f7, #ec4899)" />
-            <StatCard icon={Clock} label="Timetables" value={stats.totalTimetables} change={8} changeType="up" color="#10d9a0" gradient="linear-gradient(135deg, #10d9a0, #06b6d4)" />
-            <StatCard icon={Server} label="Resources" value={stats.totalResources} color="#f59e0b" gradient="linear-gradient(135deg, #f59e0b, #ef4444)" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+            <StatCard icon={Users}   label="Total Members"    value={stats.totalUsers}       change={12} changeType="up" color="#4f8ef7" gradient="linear-gradient(135deg, #4f8ef7, #6366f1)" />
+            <StatCard icon={Layers}  label="Departments"      value={stats.totalDepartments}              color="#a855f7" gradient="linear-gradient(135deg, #a855f7, #ec4899)" />
+            <StatCard icon={Clock}   label="Timetables"       value={stats.totalTimetables}  change={8}  changeType="up" color="#10d9a0" gradient="linear-gradient(135deg, #10d9a0, #06b6d4)" />
+            <StatCard icon={Server}  label="Resources"        value={stats.totalResources}               color="#f59e0b" gradient="linear-gradient(135deg, #f59e0b, #ef4444)" />
+            <StatCard icon={UserX}   label="Absences (30d)"   value={stats.totalAbsences}                color="#f74f6e" gradient="linear-gradient(135deg, #f74f6e, #f7a94f)" />
           </div>
 
           {/* Charts Row */}
