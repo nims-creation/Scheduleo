@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-import { Calendar, Users, Zap, ArrowRight, CheckCircle, AlertCircle, TrendingUp, BookOpen } from 'lucide-react';
+import { Calendar, Users, Zap, ArrowRight, CheckCircle, AlertCircle, TrendingUp, BookOpen, UserX } from 'lucide-react';
 
 const DashboardHome = () => {
   const { user } = useAuth();
@@ -40,9 +40,10 @@ const DashboardHome = () => {
   ];
 
   const quickActions = [
-    { label: 'View Timetables', desc: 'Browse and manage schedules', icon: Calendar, path: '/dashboard/timetables', rgb: '79,142,247', color: 'var(--brand-primary)' },
-    { label: 'Manage Team', desc: 'View and invite members', icon: Users, path: '/dashboard/team', rgb: '155,114,247', color: 'var(--brand-secondary)' },
-    { label: 'Generate Schedule', desc: 'Auto-create with AI engine', icon: Zap, path: '/dashboard/timetables', rgb: '16,217,160', color: 'var(--brand-accent)' },
+    { label: 'View Timetables',      desc: 'Browse and manage schedules',     icon: Calendar, path: '/dashboard/timetables', rgb: '79,142,247',  color: 'var(--brand-primary)' },
+    { label: 'Manage Team',          desc: 'View and invite members',          icon: Users,    path: '/dashboard/team',       rgb: '155,114,247', color: 'var(--brand-secondary)' },
+    { label: 'Generate Schedule',    desc: 'Auto-create with AI engine',      icon: Zap,      path: '/dashboard/timetables', rgb: '16,217,160',  color: 'var(--brand-accent)' },
+    { label: 'Absence Management',   desc: 'Mark absent & assign substitutes',icon: UserX,    path: '/dashboard/absences',   rgb: '247,79,110',  color: 'var(--brand-danger)' },
   ];
 
   return (
