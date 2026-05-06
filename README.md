@@ -89,13 +89,14 @@ flowchart TD
 | 🏢 **Multi-Tenant Workspaces** | Isolated organisations — each with their own members, roles, and data |
 | 👥 **Team Management** | Invite members, assign roles (Admin / Member), manage departments |
 | 📅 **Interactive Calendar** | Month-view calendar with events, public holidays, and schedule overlays |
-| 📊 **Reports & Analytics** | Recharts-powered dashboards: utilisation rates, weekly activity, resource usage |
+| 📊 **Reports & Analytics** | Recharts-powered dashboards: utilisation rates, weekly activity, resource usage, absence trends |
 | 🔔 **Real-time Notifications** | In-app notification centre with mark-as-read and polling |
 | 💳 **Billing & Subscriptions** | Free / Pro / Enterprise tiers with multi-currency support (INR, USD, EUR, GBP, JPY) |
 | 🔐 **Google OAuth2 SSO** | One-click sign-in via Google alongside email/password auth |
 | 🤖 **AI Chatbot** | Floating assistant powered by OpenAI for scheduling guidance |
 | 📋 **Activity Log** | Full audit trail of every action taken across the organisation |
 | 📦 **Resource Management** | Rooms, labs, equipment, vehicles — with availability toggles |
+| 🚨 **Teacher Absence Management** | Mark teachers absent, auto-cancel or reassign slots to conflict-free substitutes |
 
 ---
 
@@ -264,7 +265,9 @@ This platform was engineered to demonstrate deep full-stack competency — from 
 For **recruiters or technical reviewers**, the highest-value areas to explore are:
 
 - `Schedulo/src/.../service/impl/timetable/` — the core scheduling engine
+- `Schedulo/src/.../service/impl/AbsenceServiceImpl.java` — substitute-first / cancellation-fallback logic
 - `Schedulo/src/.../security/` — JWT + OAuth2 security pipeline
+- `frontend/src/pages/dashboard/AbsenceManagement.jsx` — real-time substitute finder & conflict resolution UI
 - `frontend/src/pages/dashboard/` — rich dashboard pages (Calendar, Reports, Billing)
 - `.github/workflows/` — automated CI/CD pipeline
 
