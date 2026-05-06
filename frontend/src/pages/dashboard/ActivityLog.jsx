@@ -1,11 +1,12 @@
 import React from 'react';
 import api from '../../services/api';
-import { Activity, User, Clock, Filter, ChevronLeft, ChevronRight, Search, Shield, Edit, Trash2, Plus, Eye, LogIn, LogOut, Download, Upload, Zap } from 'lucide-react';
+import { Activity, User, Clock, Filter, ChevronLeft, ChevronRight, Search, Shield, Edit, Trash2, Plus, Eye, LogIn, LogOut, Download, Upload, Zap, UserX, UserCheck } from 'lucide-react';
 
 const actionIcons = {
   CREATE: Plus, UPDATE: Edit, DELETE: Trash2, LOGIN: LogIn, LOGOUT: LogOut,
   VIEW: Eye, EXPORT: Download, IMPORT: Upload, GENERATE: Zap,
   ASSIGN: User, ACTIVATE: Shield, DEACTIVATE: Shield,
+  ABSENCE: UserX, SUBSTITUTE: UserCheck,
 };
 
 const actionColors = {
@@ -13,6 +14,7 @@ const actionColors = {
   LOGIN: '#10d9a0', LOGOUT: '#f7a84f', VIEW: '#8b8fa3',
   EXPORT: '#a855f7', IMPORT: '#06b6d4', GENERATE: '#f59e0b',
   ASSIGN: '#4f8ef7', ACTIVATE: '#10d9a0', DEACTIVATE: '#f74f6e',
+  ABSENCE: '#f74f6e', SUBSTITUTE: '#10d9a0',
 };
 
 const ActivityLog = () => {
