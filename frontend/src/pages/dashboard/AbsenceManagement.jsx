@@ -3,7 +3,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import {
   UserX, UserCheck, Search, Plus, X, CheckCircle,
-  AlertTriangle, Calendar, Clock, RefreshCw, ChevronDown
+  AlertTriangle, Calendar, Clock, RefreshCw
 } from 'lucide-react';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -161,6 +161,7 @@ const AbsenceManagement = () => {
     total:       absences.length,
     substituted: absences.filter(a => a.resolution === 'SUBSTITUTED').length,
     cancelled:   absences.filter(a => a.resolution === 'CANCELLED').length,
+    pending:     absences.filter(a => a.resolution === 'PENDING').length,
   };
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -183,11 +184,12 @@ const AbsenceManagement = () => {
       </div>
 
       {/* ── Stats bar ───────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
         {[
-          { label: 'Total Absences',  value: stats.total,       icon: <Calendar size={18} />, color: 'var(--brand-primary)' },
-          { label: 'Substituted',     value: stats.substituted, icon: <UserCheck size={18} />, color: 'var(--brand-accent)' },
+          { label: 'Total Absences',  value: stats.total,       icon: <Calendar size={18} />,      color: 'var(--brand-primary)' },
+          { label: 'Substituted',     value: stats.substituted, icon: <UserCheck size={18} />,     color: 'var(--brand-accent)' },
           { label: 'Cancelled',       value: stats.cancelled,   icon: <AlertTriangle size={18} />, color: 'var(--brand-danger)' },
+          { label: 'Pending',         value: stats.pending,     icon: <Clock size={18} />,         color: '#f7a94f' },
         ].map(s => (
           <div key={s.label} className="glass-card" style={{ padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}>
