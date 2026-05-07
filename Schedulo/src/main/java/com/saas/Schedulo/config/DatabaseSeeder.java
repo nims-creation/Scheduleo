@@ -1,31 +1,58 @@
 package com.saas.Schedulo.config;
 
-import com.saas.Schedulo.entity.user.Role;
-import com.saas.Schedulo.repository.user.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+
+/**
+ * Seeds essential reference data (roles) using raw JDBC so it is completely
+ * independent of the JPA transaction manager. This avoids
+ * CannotCreateTransactionException on cold-start when pgBouncer has not yet
+ * established a warm connection.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class DatabaseSeeder implements CommandLineRunner {
 
-    private final RoleRepository roleRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) {
-        // Wrap entirely — if DB is unreachable at startup the app still boots.
-        // Health check will surface the real connection state.
-        try {
-            tryAlterResourcesTable();
-            seedRoles();
-        } catch (Exception e) {
-            log.error("DatabaseSeeder failed (DB may be unreachable): {}", e.getMessage());
+        retryOnFailure(this::tryAlterResourcesTable, "ALTER resources table");
+        retryOnFailure(this::seedRoles,               "seed roles");
+    }
+
+    // ── Retry wrapper ─────────────────────────────────────────────────────────
+
+    private void retryOnFailure(Runnable task, String label) {
+        int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                task.run();
+                return;
+            } catch (Exception e) {
+                log.warn("DatabaseSeeder [{}] attempt {}/{} failed: {}",
+                        label, attempt, maxAttempts, e.getMessage());
+                if (attempt < maxAttempts) {
+                    try {
+                        Thread.sleep(2000L * attempt);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    log.error("DatabaseSeeder [{}] gave up after {} attempts — "
+                            + "app is running but may need manual role seeding.", label, maxAttempts);
+                }
+            }
         }
     }
+
+    // ── Schema adjustments ────────────────────────────────────────────────────
 
     private void tryAlterResourcesTable() {
         String[] statements = {
@@ -38,20 +65,38 @@ public class DatabaseSeeder implements CommandLineRunner {
             try {
                 jdbcTemplate.execute(sql);
             } catch (Exception e) {
-                log.debug("ALTER skipped (column may not exist): {}", e.getMessage());
+                log.debug("ALTER skipped (column may not exist or already nullable): {}",
+                        e.getMessage());
             }
         }
     }
 
+    // ── Role seeding via plain JDBC (no JPA / no @Transactional needed) ───────
+
     private void seedRoles() {
-        if (roleRepository.count() > 0) {
-            log.info("Roles already exist — skipping seed.");
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM roles", Integer.class);
+
+        if (count != null && count > 0) {
+            log.info("Roles already exist ({}) — skipping seed.", count);
             return;
         }
-        log.info("Seeding default roles...");
-        roleRepository.save(Role.builder().name("ROLE_USER").description("Standard User Role").isSystemRole(true).build());
-        roleRepository.save(Role.builder().name("ROLE_ADMIN").description("Administrator Role").isSystemRole(true).build());
-        roleRepository.save(Role.builder().name("ROLE_MEMBER").description("Organisation Member").isSystemRole(true).build());
-        log.info("Seeded {} roles.", roleRepository.count());
+
+        log.info("Seeding default roles via JDBC...");
+
+        // ON CONFLICT DO NOTHING is idempotent — safe to run multiple times
+        String sql = "INSERT INTO roles "
+                + "(id, name, description, is_system_role, is_active, is_deleted, version) "
+                + "VALUES (?::uuid, ?, ?, true, true, false, 0) "
+                + "ON CONFLICT (name) DO NOTHING";
+
+        jdbcTemplate.update(sql, UUID.randomUUID().toString(),
+                "ROLE_USER",   "Standard User Role");
+        jdbcTemplate.update(sql, UUID.randomUUID().toString(),
+                "ROLE_ADMIN",  "Administrator Role");
+        jdbcTemplate.update(sql, UUID.randomUUID().toString(),
+                "ROLE_MEMBER", "Organisation Member");
+
+        log.info("Default roles seeded successfully.");
     }
 }

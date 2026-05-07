@@ -21,7 +21,8 @@ spring:
       minimum-idle: 1
       connection-timeout: 20000
       idle-timeout: 300000
-      max-lifetime: 600000
+      # Keep below Supabase pgBouncer's server_idle_timeout (600s) to prevent stale connections
+      max-lifetime: 540000
       # Validate connections before hand-off to JPA (prevents CannotCreateTransactionException)
       connection-test-query: SELECT 1
       validation-timeout: 5000
@@ -30,10 +31,15 @@ spring:
       # Skip pool validation at startup — app boots even if DB is momentarily slow
       initialization-fail-timeout: 0
       data-source-properties:
-        # Disable server-side prepared statements (required for pgBouncer)
+        # Disable server-side prepared statements (required for pgBouncer transaction mode)
         prepareThreshold: 0
         preparedStatementCacheQueries: 0
         sslmode: ${DB_SSL_MODE:require}
+        # TCP keepalive & timeout — detect dead pgBouncer connections fast
+        tcpKeepAlive: true
+        socketTimeout: 30
+        # Tell the driver not to auto-commit so Spring's @Transactional controls commits
+        autoCommit: false
 
   # ── JPA / Hibernate ───────────────────────────────────────
   jpa:
