@@ -147,8 +147,6 @@ public class AbsenceServiceImpl implements AbsenceService {
                 .resolution(resolution)
                 .affectedEntriesCount(entries.size())
                 .adminNotes(request.getAdminNotes())
-                .isActive(true)
-                .isDeleted(false)
                 .build();
 
         absence = absenceRepository.save(absence);
