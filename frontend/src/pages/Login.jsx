@@ -136,7 +136,7 @@ const Login = () => {
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: 'var(--text-muted)',
+                  color: 'var(--text-secondary)',
                   display: 'flex',
                   alignItems: 'center',
                   padding: '0',

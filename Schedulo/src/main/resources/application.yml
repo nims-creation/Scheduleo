@@ -22,6 +22,11 @@ spring:
       connection-timeout: 20000
       idle-timeout: 300000
       max-lifetime: 600000
+      # Validate connections before hand-off to JPA (prevents CannotCreateTransactionException)
+      connection-test-query: SELECT 1
+      validation-timeout: 5000
+      # Keepalive prevents pgBouncer from silently dropping idle connections
+      keepalive-time: 60000
       # Skip pool validation at startup — app boots even if DB is momentarily slow
       initialization-fail-timeout: 0
       data-source-properties:
