@@ -1,7 +1,7 @@
 package com.saas.Schedulo.service.payment;
 
 import com.saas.Schedulo.dto.request.payment.CreateSubscriptionRequest;
-import com.saas.Schedulo.dto.response.payment.SubscriptionResponse;
+import com.saas.Schedulo.dto.response.subscription.SubscriptionResponse;
 
 import java.util.UUID;
 
