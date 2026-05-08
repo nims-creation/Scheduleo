@@ -1,6 +1,6 @@
 # ============================================================
 # application.yml — Production-ready for Render deployment
-# Works with: Supabase PostgreSQL + Upstash Redis
+# Works with: Supabase PostgreSQL
 # ============================================================
 spring:
   application:
@@ -65,18 +65,6 @@ spring:
   flyway:
     enabled: false
 
-  # ── Redis (Upstash via TLS) ───────────────────────────────
-  data:
-    redis:
-      url: ${SPRING_DATA_REDIS_URL:redis://localhost:6379}
-      ssl:
-        enabled: ${SPRING_DATA_REDIS_SSL_ENABLED:false}
-      lettuce:
-        pool:
-          max-active: 3
-          max-idle: 3
-          min-idle: 0
-          max-wait: 2000ms
 
   # ── Mail (Gmail SMTP) ─────────────────────────────────────
   mail:
