@@ -132,7 +132,8 @@ const TeamMembers = () => {
       const content = event.target.result;
       // Strip out the CSV header if it looks like one, or just append
       // In this case, just appending it and letting the backend or split logic handle it is fine
-      setBulkInput(prev => prev ? prev + '\\n' + content : content);
+      setBulkInput(prev => prev ? prev + '\
+' + content : content);
     };
     reader.readAsText(file);
     e.target.value = null; // reset so same file can be uploaded again if needed
