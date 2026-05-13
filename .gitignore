@@ -1,9 +1,15 @@
 node_modules/
 .env
 *.log
+boot*.txt
 boot*.log
 stripe.exe
 *.exe
 target/
 dist/
 .idea/
+test.txt
+gen_*.ps1
+report_content.txt
+report_gen/
+FinalProjectReport_ref.docx
