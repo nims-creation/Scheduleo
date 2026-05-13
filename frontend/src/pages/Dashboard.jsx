@@ -55,7 +55,7 @@ const Dashboard = () => {
 
   const handleMarkAsRead = async (id) => {
     try {
-      await api.put(`/notifications/${id}/read`);
+      await api.put(`/api/v1/notifications/${id}/read`);
       fetchNotifications();
     } catch (err) {
       console.error(err);
