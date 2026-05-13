@@ -568,7 +568,7 @@ const Timetables = () => {
     const rows = entries.map(e => [
       e.dayOfWeek, e.startTime, e.endTime, e.subjectName, e.teacherName, e.roomName
     ].map(val => `"${val || ''}"`).join(','));
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join("\\n");
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
