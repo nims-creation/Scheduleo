@@ -258,13 +258,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private RefreshToken createRefreshToken(User user, String deviceInfo) {
-        RefreshToken refreshToken = refreshTokenRepository.findByUserId(user.getId())
-                .orElseGet(() -> RefreshToken.builder().user(user).build());
+        refreshTokenRepository.deleteByUserId(user.getId());
+        refreshTokenRepository.flush();
 
-        refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenExpirationMs));
-        refreshToken.setDeviceInfo(deviceInfo);
-        refreshToken.setIsRevoked(false);
+        RefreshToken refreshToken = RefreshToken.builder()
+                .user(user)
+                .token(UUID.randomUUID().toString())
+                .expiryDate(Instant.now().plusMillis(refreshTokenExpirationMs))
+                .deviceInfo(deviceInfo)
+                .isRevoked(false)
+                .build();
 
         return refreshTokenRepository.save(refreshToken);
     }

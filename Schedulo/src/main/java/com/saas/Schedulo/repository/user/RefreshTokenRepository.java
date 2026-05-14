@@ -14,7 +14,9 @@ import java.util.UUID;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
     Optional<RefreshToken> findByToken(String token);
     Optional<RefreshToken> findByUserIdAndIsRevokedFalse(UUID userId);
-    Optional<RefreshToken> findByUserId(UUID userId);
+    @Modifying
+    @Query("DELETE FROM RefreshToken rt WHERE rt.user.id = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
     @Modifying
     @Query("UPDATE RefreshToken rt SET rt.isRevoked = true WHERE rt.user.id = :userId")
     void revokeAllByUser(@Param("userId") UUID userId);
