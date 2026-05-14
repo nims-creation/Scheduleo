@@ -45,7 +45,7 @@ spring:
   jpa:
     hibernate:
       # Set to none for production speed. Schema is already initialized in Supabase.
-      ddl-auto: none
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
