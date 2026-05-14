@@ -37,13 +37,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final String LOGIN_PATH  = "/api/v1/auth/login";
     private static final String SIGNUP_PATH = "/api/v1/auth/signup";
 
-    // Login: 5 tokens, refill 5 every 15 minutes
-    private static final int  LOGIN_CAPACITY      = 5;
-    private static final long LOGIN_REFILL_MINUTES = 15;
+    // Login: 1000 tokens, refill 1000 every 1 minutes
+    private static final int  LOGIN_CAPACITY      = 1000;
+    private static final long LOGIN_REFILL_MINUTES = 1;
 
-    // Signup: 3 tokens, refill 3 every 60 minutes
-    private static final int  SIGNUP_CAPACITY       = 3;
-    private static final long SIGNUP_REFILL_MINUTES = 60;
+    // Signup: 1000 tokens, refill 1000 every 1 minutes
+    private static final int  SIGNUP_CAPACITY       = 1000;
+    private static final long SIGNUP_REFILL_MINUTES = 1;
 
     /**
      * Separate bucket stores for each endpoint so limits are independent.
